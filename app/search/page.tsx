@@ -3,8 +3,9 @@ import { Suspense } from "react"
 import SearchResultsList from "./_components/search-results-list"
 import { Skeleton } from "@/components/ui/skeleton"
 
-export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
-  const { q = "" } = await searchParams
+export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string; page?: string }> }) {
+  const { q = "", page } = await searchParams
+  const currentPage = page ? Number(page) : 1
 
   return (
     <div className="min-h-screen bg-background">
@@ -20,7 +21,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           </div>
 
           <Suspense fallback={<SearchSkeleton />}>
-            <SearchResultsList query={q} />
+            <SearchResultsList query={q} page={currentPage} />
           </Suspense>
         </div>
       </main>

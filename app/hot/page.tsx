@@ -3,7 +3,10 @@ import { Suspense } from "react"
 import HotList from "./_components/hot-list"
 import { Skeleton } from "@/components/ui/skeleton"
 
-export default async function HotPage() {
+export default async function HotPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+  const { page } = await searchParams
+  const currentPage = page ? Number(page) : 1
+
   return (
     <div className="min-h-screen bg-background">
       <DramaHeader />
@@ -15,7 +18,7 @@ export default async function HotPage() {
         </div>
 
         <Suspense fallback={<HotSkeleton />}>
-          <HotList />
+          <HotList page={currentPage} />
         </Suspense>
       </main>
     </div>

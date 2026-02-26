@@ -1,15 +1,16 @@
 import { dramaApiService } from "@/lib/services/drama-api"
 import DramaCard from "@/app/(home)/_components/drama-card"
 import { Search } from "lucide-react"
+import { Pagination } from "@/components/pagination"
 
 interface SearchResultsListProps {
   query: string
+  page?: number
 }
 
-export default async function SearchResultsList({ query }: SearchResultsListProps) {
-  const res = await dramaApiService.search({ wd: query, limit: 30 })
+export default async function SearchResultsList({ query, page = 1 }: SearchResultsListProps) {
+  const res = await dramaApiService.search({ wd: query, page, limit: 24 })
 
-  // 获取详情以获取封面
   const details = await Promise.all(res.list.map((item) => dramaApiService.getDetail({ id: item.id })))
 
   if (details.length === 0) {
@@ -35,6 +36,8 @@ export default async function SearchResultsList({ query }: SearchResultsListProp
           <DramaCard key={item.id} item={item} />
         ))}
       </div>
+
+      <Pagination currentPage={page} totalPages={res.pageCount} basePath="/search" extraParams={{ q: query }} />
     </div>
   )
 }

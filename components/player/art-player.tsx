@@ -88,7 +88,7 @@ export default function ArtPlayer({ url, onEnded, onPrevEpisode, onNextEpisode, 
             setAutoPlayNext((prev) => !prev)
           },
         },
-      ].filter(Boolean) as Artplayer.Controls[],
+      ].filter((control): control is NonNullable<typeof control> => Boolean(control)),
       settings: [
         {
           html: "播放速度",

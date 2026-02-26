@@ -17,7 +17,7 @@ export default async function DetailModal({ params }: { params: Promise<{ id: st
       <div className="flex flex-col w-full bg-background overflow-hidden h-[85vh]">
         {/* 顶部海报区域 - 固定 */}
         <div className="relative aspect-video w-full overflow-hidden shrink-0">
-          <Image src={drama.cover} alt={drama.title} fill className="object-cover" priority />
+          <Image src={drama.cover} alt={drama.title} fill className="object-cover" priority sizes="(max-width: 768px) 50vw, 200px" />
           {/* 底部渐变和标题 */}
           <div className="absolute inset-x-0 bottom-0 h-full bg-linear-to-t from-black/90 via-black/20 to-transparent flex flex-col justify-end p-6 pb-4">
             <h2 className="text-xl font-bold text-white leading-tight drop-shadow-md">{drama.title}</h2>

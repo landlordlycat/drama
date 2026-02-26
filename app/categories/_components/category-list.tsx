@@ -1,5 +1,6 @@
 import { dramaApiService } from "@/lib/services/drama-api"
 import DramaCard from "@/app/(home)/_components/drama-card"
+import { Pagination } from "@/components/pagination"
 
 interface CategoryListProps {
   typeId?: number
@@ -7,9 +8,8 @@ interface CategoryListProps {
 }
 
 export default async function CategoryList({ typeId, page = 1 }: CategoryListProps) {
-  const res = await dramaApiService.getList({ typeId, page, limit: 24 }) // 减少单次加载数量以提升速度
+  const res = await dramaApiService.getList({ typeId, page, limit: 24 })
 
-  // 获取每个剧集的详情以补充封面和集数信息
   const details = await Promise.all(res.list.map((item) => dramaApiService.getDetail({ id: item.id })))
 
   if (details.length === 0) {
@@ -21,10 +21,13 @@ export default async function CategoryList({ typeId, page = 1 }: CategoryListPro
   }
 
   return (
-    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 py-8">
-      {details.map((item) => (
-        <DramaCard key={item.id} item={item} />
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 py-8">
+        {details.map((item) => (
+          <DramaCard key={item.id} item={item} />
+        ))}
+      </div>
+      <Pagination currentPage={page} totalPages={res.pageCount} basePath="/categories" extraParams={{ typeId }} />
+    </>
   )
 }
