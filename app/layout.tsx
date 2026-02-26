@@ -1,14 +1,8 @@
 import type { Metadata } from "next"
-import { BBH_Bogle } from "next/font/google"
-import { ThemeProvider } from "@/components/theme-provier"
-import "@/styles/globals.css"
 
-const bbh_bogle = BBH_Bogle({
-  subsets: ["latin"],
-  weight: "400",
-  display: "swap",
-  adjustFontFallback: false,
-})
+import { ThemeProvider } from "@/components/theme-provier"
+
+import "@/styles/globals.css"
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -24,9 +18,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={bbh_bogle.className}>
+      <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <div className="max-w-300 mx-auto min-h-screen">
+          <div className="min-h-screen max-w-300 mx-auto">
             {modal}
             {children}
           </div>

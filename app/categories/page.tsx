@@ -11,7 +11,7 @@ export default async function Categories({ searchParams }: { searchParams: Promi
   console.log(typesRes)
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background mb-10">
       <DramaHeader />
 
       <main className="max-w-300 mx-auto px-4 md:px-10">
