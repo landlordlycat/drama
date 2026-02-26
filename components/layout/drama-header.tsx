@@ -1,7 +1,7 @@
 import Logo from "@/components/drama/logo"
 import UserAvatar from "@/components/drama/user-avatar"
 import { ModeToggle } from "@/components/mode-toggle"
-import { Bell } from "lucide-react"
+
 import Link from "next/link"
 import { NavCategories } from "@/constants/nav-categories"
 import GlobalSearch from "./global-search"
@@ -23,7 +23,6 @@ export default function DramaHeader() {
       <div className="flex items-center gap-5">
         <GlobalSearch />
         <div className="flex items-center gap-4">
-          <Bell className="w-5 h-5 cursor-pointer hover:text-primary transition-colors" />
           <ModeToggle />
           <UserAvatar />
         </div>
