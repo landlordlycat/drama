@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Search } from "lucide-react"
+import { Search, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 
 export default function GlobalSearch() {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -29,7 +30,47 @@ export default function GlobalSearch() {
 
   return (
     <div className="relative flex items-center">
-      <form onSubmit={handleSearch} className={cn("relative flex items-center transition-all duration-300 ease-in-out", isExpanded ? "w-64" : "w-40")}>
+      {/* 移动端：图标按钮 + 展开后的搜索框 */}
+      <div className="md:hidden">
+        {isExpanded ? (
+          <form onSubmit={handleSearch} className="fixed inset-x-0 top-16 z-50 bg-background/95 backdrop-blur-md px-4 py-3 border-b">
+            <div className="relative flex items-center gap-2">
+              <Search className="absolute left-3 w-4 h-4 text-muted-foreground z-10" />
+              <Input
+                ref={inputRef}
+                type="text"
+                placeholder="搜索影片..."
+                className="pl-9 h-10 rounded-full bg-muted/50 border-none focus-visible:ring-2 focus-visible:ring-primary/20"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                autoFocus
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setIsExpanded(false)
+                  setQuery("")
+                }}
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+          </form>
+        ) : (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsExpanded(true)}
+          >
+            <Search className="h-5 w-5" />
+          </Button>
+        )}
+      </div>
+
+      {/* 桌面端：原有搜索框 */}
+      <form onSubmit={handleSearch} className={cn("hidden md:flex relative items-center transition-all duration-300 ease-in-out", isExpanded ? "w-64" : "w-40")}>
         <Search className={cn("absolute left-3 w-4 h-4 transition-colors z-10", isExpanded ? "text-primary" : "text-muted-foreground")} />
         <Input
           ref={inputRef}

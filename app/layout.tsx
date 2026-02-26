@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <div className="min-h-screen max-w-300 mx-auto">
+          <div className="min-h-screen max-w-300 mx-auto pb-16 md:pb-0">
             {modal}
             {children}
           </div>

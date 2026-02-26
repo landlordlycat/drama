@@ -124,6 +124,9 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+  .hide-mobile-nav nav[class*="fixed bottom-0"] {
+    display: none;
+  }
 }
 
 @layer base {
