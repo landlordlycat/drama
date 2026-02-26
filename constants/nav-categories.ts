@@ -5,11 +5,11 @@ const NavCategories = [
   },
   {
     title: "分类",
-    href: "/movies",
+    href: "/categories",
   },
   {
     title: "热门",
-    href: "/series",
+    href: "/hot",
   },
 ]
 

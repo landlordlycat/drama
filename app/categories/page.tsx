@@ -1,0 +1,40 @@
+import DramaHeader from "@/components/layout/drama-header"
+import { dramaApiService } from "@/lib/services/drama-api"
+import { Suspense } from "react"
+import CategoryFilter from "./_components/category-filter"
+import CategoryList from "./_components/category-list"
+import { Skeleton } from "@/components/ui/skeleton"
+
+export default async function Categories({ searchParams }: { searchParams: Promise<{ typeId?: string; page?: string }> }) {
+  const { typeId, page } = await searchParams
+  const typesRes = await dramaApiService.getTypes({})
+  console.log(typesRes)
+
+  return (
+    <div className="min-h-screen bg-background">
+      <DramaHeader />
+
+      <main className="max-w-300 mx-auto px-4 md:px-10">
+        <CategoryFilter types={typesRes.types} />
+
+        <Suspense fallback={<CategorySkeleton />}>
+          <CategoryList typeId={typeId ? Number(typeId) : undefined} page={page ? Number(page) : 1} />
+        </Suspense>
+      </main>
+    </div>
+  )
+}
+
+function CategorySkeleton() {
+  return (
+    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 py-8">
+      {Array.from({ length: 12 }).map((_, i) => (
+        <div key={i} className="space-y-3">
+          <Skeleton className="aspect-[2/3] w-full rounded-lg" />
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-3 w-1/2" />
+        </div>
+      ))}
+    </div>
+  )
+}

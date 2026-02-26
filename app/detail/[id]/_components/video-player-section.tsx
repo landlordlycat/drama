@@ -1,11 +1,11 @@
 "use client"
 
-import React, { useState, useRef, useEffect, useCallback } from "react"
+import { useState, useCallback } from "react"
 import { DramaDetail, Episode } from "@/lib/types/api"
 import { Calendar, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { formatDate } from "@/lib/formatDate"
-import Artplayer from "artplayer"
+import ArtPlayer from "@/components/player/art-player"
 
 interface VideoPlayerSectionProps {
   drama: DramaDetail
@@ -13,149 +13,30 @@ interface VideoPlayerSectionProps {
 
 export default function VideoPlayerSection({ drama }: VideoPlayerSectionProps) {
   const [currentEpisodeIndex, setCurrentEpisodeIndex] = useState(0)
-  const [isWidescreen, setIsWidescreen] = useState(false)
-  const [autoPlayNext, setAutoPlayNext] = useState(true)
-  const artRef = useRef<Artplayer | null>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
+
   const currentEpisode = drama.episodes[currentEpisodeIndex]
 
-  // 初始化播放器
-  const initPlayer = useCallback(
-    (url: string) => {
-      if (!containerRef.current) return
-
-      // 销毁旧实例
-      if (artRef.current) {
-        artRef.current.destroy()
-        artRef.current = null
+  const handleNextEpisode = useCallback(() => {
+    setCurrentEpisodeIndex((prev) => {
+      if (prev < drama.episodes.length - 1) {
+        return prev + 1
       }
+      return prev
+    })
+  }, [drama.episodes.length])
 
-      if (!url) return
-
-      artRef.current = new Artplayer({
-        container: containerRef.current,
-        url: url,
-        autoplay: true,
-        pip: true,
-        autoSize: false,
-        autoMini: true,
-        screenshot: true,
-        setting: true,
-        loop: false,
-        flip: true,
-        playbackRate: true,
-        aspectRatio: true,
-        fullscreen: true,
-        fullscreenWeb: true,
-        subtitleOffset: true,
-        miniProgressBar: true,
-        mutex: true,
-        backdrop: true,
-        playsInline: true,
-        autoPlayback: true,
-        airplay: true,
-        theme: "#6C5CE7",
-        lang: navigator.language.toLowerCase(),
-        moreVideoAttr: {
-          crossOrigin: "anonymous",
-        },
-        controls: [
-          {
-            name: "prev-episode",
-            position: "left",
-            html: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>',
-            tooltip: "上一集",
-            click: function () {
-              if (currentEpisodeIndex > 0) {
-                setCurrentEpisodeIndex((prev) => prev - 1)
-              }
-            },
-          },
-          {
-            name: "next-episode",
-            position: "left",
-            html: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>',
-            tooltip: "下一集",
-            click: function () {
-              if (currentEpisodeIndex < drama.episodes.length - 1) {
-                setCurrentEpisodeIndex((prev) => prev + 1)
-              }
-            },
-          },
-          {
-            name: "auto-next",
-            position: "right",
-            html: `<span style="display: flex; align-items: center; gap: 4px; font-size: 12px; padding: 0 8px;">
-                    自动下一集
-                    <span style="width: 32px; height: 18px; background: ${autoPlayNext ? "#3498DB" : "#666"}; border-radius: 9px; position: relative; transition: all 0.2s;">
-                      <span style="width: 14px; height: 14px; background: white; border-radius: 50%; position: absolute; top: 2px; ${autoPlayNext ? "right: 2px;" : "left: 2px;"} transition: all 0.2s;"></span>
-                    </span>
-                  </span>`,
-            tooltip: autoPlayNext ? "关闭自动连播" : "开启自动连播",
-            click: function () {
-              setAutoPlayNext((prev) => !prev)
-            },
-          },
-        ],
-        settings: [
-          {
-            html: "播放速度",
-            selector: [
-              { html: "0.5x", value: 0.5 },
-              { html: "0.75x", value: 0.75 },
-              { html: "正常", value: 1, default: true },
-              { html: "1.25x", value: 1.25 },
-              { html: "1.5x", value: 1.5 },
-              { html: "2x", value: 2 },
-            ],
-            onSelect: function (item) {
-              if (artRef.current) {
-                artRef.current.playbackRate = item.value
-              }
-              return item.html
-            },
-          },
-        ],
-      })
-
-      // 视频结束时的处理
-      artRef.current.on("video:ended", () => {
-        if (autoPlayNext && currentEpisodeIndex < drama.episodes.length - 1) {
-          setCurrentEpisodeIndex((prev) => prev + 1)
-        }
-      })
-    },
-    [autoPlayNext, currentEpisodeIndex, drama.episodes.length],
-  )
-
-  // 切换集数时重新初始化播放器
-  useEffect(() => {
-    if (currentEpisode?.url) {
-      initPlayer(currentEpisode.url)
-    }
-    return () => {
-      if (artRef.current) {
-        artRef.current.destroy()
-        artRef.current = null
+  const handlePrevEpisode = useCallback(() => {
+    setCurrentEpisodeIndex((prev) => {
+      if (prev > 0) {
+        return prev - 1
       }
-    }
-  }, [currentEpisode?.url, initPlayer])
+      return prev
+    })
+  }, [])
 
-  // 更新自动下一集按钮状态
-  useEffect(() => {
-    if (artRef.current) {
-      artRef.current.controls.update({
-        name: "auto-next",
-        html: `<span style="display: flex; align-items: center; gap: 4px; font-size: 12px; padding: 0 8px;">
-                自动下一集
-                <span style="width: 32px; height: 18px; background: ${autoPlayNext ? "#3498DB" : "#666"}; border-radius: 9px; position: relative; transition: all 0.2s;">
-                  <span style="width: 14px; height: 14px; background: white; border-radius: 50%; position: absolute; top: 2px; ${autoPlayNext ? "right: 2px;" : "left: 2px;"} transition: all 0.2s;"></span>
-                </span>
-              </span>`,
-        tooltip: autoPlayNext ? "关闭自动连播" : "开启自动连播",
-      })
-    }
-  }, [autoPlayNext])
+  const handleSelectEpisode = useCallback((index: number) => {
+    setCurrentEpisodeIndex(index)
+  }, [])
 
   return (
     <div className="flex flex-col space-y-6">
@@ -172,12 +53,17 @@ export default function VideoPlayerSection({ drama }: VideoPlayerSectionProps) {
       <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 transition-all duration-300`}>
         {/* 左侧：播放器与简介 */}
         <div className={`lg:col-span-8 space-y-6`}>
-          {/* ArtPlayer 播放器区域 */}
-          <div ref={containerRef} className="relative aspect-video w-full bg-black rounded-xl overflow-hidden">
-            {!currentEpisode?.url && <div className="absolute inset-0 flex items-center justify-center text-white/50">暂无播放资源</div>}
-          </div>
+          {/* ArtPlayer 播放器 */}
+          <ArtPlayer
+            url={currentEpisode?.url || ""}
+            onEnded={handleNextEpisode}
+            onPrevEpisode={handlePrevEpisode}
+            onNextEpisode={handleNextEpisode}
+            hasPrev={currentEpisodeIndex > 0}
+            hasNext={currentEpisodeIndex < drama.episodes.length - 1}
+          />
 
-          <div className={`grid grid-cols-1 gap-6`}>
+          <div className={`grid grid-cols-1  gap-6`}>
             {/* 剧集介绍卡片 */}
             <div className="bg-card border rounded-2xl p-8 space-y-6">
               <div className="flex items-center gap-2 text-lg font-bold">
@@ -208,8 +94,9 @@ export default function VideoPlayerSection({ drama }: VideoPlayerSectionProps) {
         </div>
 
         {/* 右侧：选集列表 (常规模式) */}
+
         <div className="lg:col-span-4">
-          <EpisodeList episodes={drama.episodes} currentEpisodeIndex={currentEpisodeIndex} onSelect={setCurrentEpisodeIndex} total={drama.total} />
+          <EpisodeList episodes={drama.episodes} currentEpisodeIndex={currentEpisodeIndex} onSelect={handleSelectEpisode} total={drama.total} />
         </div>
       </div>
     </div>
