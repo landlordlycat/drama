@@ -2,6 +2,12 @@ import DramaHeader from "@/components/layout/drama-header"
 import { Suspense } from "react"
 import HotList from "./_components/hot-list"
 import { Skeleton } from "@/components/ui/skeleton"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "热门推荐",
+  description: "最受欢迎的热门短剧推荐，精选优质内容，发现精彩剧集。",
+}
 
 export default async function HotPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
   const { page } = await searchParams

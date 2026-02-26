@@ -4,24 +4,47 @@ import { Suspense } from "react"
 import CategoryFilter from "./_components/category-filter"
 import CategoryList from "./_components/category-list"
 import { Skeleton } from "@/components/ui/skeleton"
+import type { Metadata } from "next"
 
-export default async function Categories({ searchParams }: { searchParams: Promise<{ typeId?: string; page?: string }> }) {
-  const { typeId, page } = await searchParams
-  const typesRes = await dramaApiService.getTypes({})
-  console.log(typesRes)
+export const metadata: Metadata = {
+  title: "分类浏览",
+  description: "按类型浏览短剧，发现您喜欢的内容。支持多种分类筛选，快速找到感兴趣的短剧。",
+}
 
+export default function Categories({ searchParams }: { searchParams: Promise<{ typeId?: string; page?: string }> }) {
   return (
     <div className="min-h-screen bg-background mb-10">
-      <DramaHeader />
+      <Suspense fallback={<div className="h-16" />}>
+        <DramaHeader />
+      </Suspense>
 
       <main className="max-w-300 mx-auto px-4 md:px-10">
-        <CategoryFilter types={typesRes.types} />
-
-        <Suspense fallback={<CategorySkeleton />}>
-          <CategoryList typeId={typeId ? Number(typeId) : undefined} page={page ? Number(page) : 1} />
+        <Suspense fallback={<div className="h-14" />}>
+          <CategoriesContent searchParams={searchParams} />
         </Suspense>
       </main>
     </div>
+  )
+}
+
+async function CategoriesContent({
+  searchParams,
+}: {
+  searchParams: Promise<{ typeId?: string; page?: string }>
+}) {
+  const { typeId, page } = await searchParams
+  const typesRes = await dramaApiService.getTypes({})
+
+  return (
+    <>
+      <Suspense>
+        <CategoryFilter types={typesRes.types} />
+      </Suspense>
+
+      <Suspense fallback={<CategorySkeleton />}>
+        <CategoryList typeId={typeId ? Number(typeId) : undefined} page={page ? Number(page) : 1} />
+      </Suspense>
+    </>
   )
 }
 

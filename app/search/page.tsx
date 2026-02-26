@@ -2,6 +2,12 @@ import DramaHeader from "@/components/layout/drama-header"
 import { Suspense } from "react"
 import SearchResultsList from "./_components/search-results-list"
 import { Skeleton } from "@/components/ui/skeleton"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "搜索",
+  description: "搜索您感兴趣的短剧，快速找到想看的内容。",
+}
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string; page?: string }> }) {
   const { q = "", page } = await searchParams
