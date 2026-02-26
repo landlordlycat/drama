@@ -1,36 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Drama - 影视在线播放平台
 
-## Getting Started
+一个基于 Next.js 构建的现代化影视在线播放平台，支持视频搜索、分类浏览、热门推荐等功能。
 
-First, run the development server:
+## ✨ 功能特性
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- 🎬 **视频播放** - 支持剧集在线播放，使用 ArtPlayer 播放器
+- 🔍 **搜索功能** - 支持关键词搜索影视资源
+- 📂 **分类浏览** - 按类型分类浏览影视内容
+- 🔥 **热门推荐** - 展示热门影视资源
+- 🌙 **主题切换** - 支持明暗主题切换
+- 📱 **响应式设计** - 适配各种设备屏幕
+
+## 🛠️ 技术栈
+
+- **框架**: Next.js 16 (App Router)
+- **语言**: TypeScript
+- **UI 组件**: Radix UI + shadcn/ui
+- **样式**: Tailwind CSS v4
+- **播放器**: ArtPlayer
+- **主题**: next-themes
+- **日期处理**: date-fns
+
+## 📁 项目结构
+
+```
+drama/
+├── app/                    # Next.js App Router
+│   ├── (home)/            # 首页模块
+│   ├── @modal/            # 模态框 (并行路由)
+│   ├── api/               # API 路由
+│   ├── categories/        # 分类页面
+│   ├── detail/            # 详情页面
+│   ├── hot/               # 热门页面
+│   ├── search/            # 搜索页面
+│   └── user/              # 用户模块
+├── components/            # 公共组件
+│   ├── ui/               # UI 基础组件
+│   ├── drama/            # 影视相关组件
+│   ├── layout/           # 布局组件
+│   └── player/           # 播放器组件
+├── config/               # 配置文件
+├── constants/            # 常量定义
+├── lib/                  # 工具库
+│   ├── services/        # API 服务
+│   └── types/           # 类型定义
+└── styles/              # 全局样式
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 快速开始
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 环境要求
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Node.js 18+
+- pnpm (推荐)
 
-## Learn More
+### 安装依赖
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm install
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 配置环境变量
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+创建 `.env.local` 文件并配置 API 地址：
 
-## Deploy on Vercel
+```env
+ZY_BASE_URL=your_api_base_url
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 启动开发服务器
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+pnpm dev
+```
+
+访问 [http://localhost:3000](http://localhost:3000) 查看应用。
+
+### 构建生产版本
+
+```bash
+pnpm build
+pnpm start
+```
+
+## 📡 API 接口
+
+项目通过 `ApiService` 类封装了以下接口：
+
+| 接口 | 方法 | 描述 |
+|------|------|------|
+| `/list` | `getList()` | 获取影视列表 |
+| `/search` | `search()` | 搜索影视 |
+| `/detail/:id` | `getDetail()` | 获取影视详情 |
+| `/hot` | `getHot()` | 获取热门影视 |
+| `/types` | `getTypes()` | 获取分类列表 |
+
+## 📄 License
+
+MIT
