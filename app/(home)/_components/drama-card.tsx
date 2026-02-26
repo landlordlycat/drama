@@ -8,8 +8,8 @@ interface DramaCardProps {
 export default function DramaCard({ item }: DramaCardProps) {
   return (
     <Link href={`/detail/${item.id}`} className="group">
-      <article className="flex flex-col relative overflow-hidden rounded-lg transition-transform duration-300 group-hover:scale-103">
-        <div className="relative aspect-2/3 w-full">
+      <article className="flex flex-col relative overflow-hidden rounded-lg transition-transform duration-300 group-hover:scale-105 border">
+        <div className="relative aspect-[2/3] w-full">
           <Image src={item.cover ?? "/placeholder.png"} alt={item.title} fill className="object-cover" sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 10vw" />
 
           {/* 渐变蒙版和文字容器 */}

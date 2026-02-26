@@ -24,10 +24,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${bbh_bogle.className}`}>
+      <body className={bbh_bogle.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {modal}
-          {children}
+          <div className="max-w-300 mx-auto min-h-screen">
+            {modal}
+            {children}
+          </div>
         </ThemeProvider>
       </body>
     </html>
