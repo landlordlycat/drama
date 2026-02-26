@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     description: "Drama 是一个优质的短剧观看平台，提供海量热门短剧、精选推荐、分类浏览。",
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.svg",
   },
 }
 
