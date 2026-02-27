@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { ThemeProvider } from "@/components/theme-provier"
 import { Toaster } from "sonner"
 
@@ -49,7 +49,8 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Toaster position="top-center" richColors />
           {modal}
-          {children}
+          <TooltipProvider>{children}</TooltipProvider>
+          {/* {children} */}
         </ThemeProvider>
       </body>
     </html>
