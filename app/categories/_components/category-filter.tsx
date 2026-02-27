@@ -25,6 +25,8 @@ export default function CategoryFilter({ types }: CategoryFilterProps) {
     } else {
       params.delete("typeId")
     }
+    // 切换分类时重置到第一页
+    params.delete("page")
 
     // 使用 startTransition 标记为非阻塞跳转，让 UI 保持响应
     startTransition(() => {

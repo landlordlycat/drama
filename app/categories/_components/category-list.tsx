@@ -8,7 +8,7 @@ interface CategoryListProps {
 }
 
 export default async function CategoryList({ typeId, page = 1 }: CategoryListProps) {
-  const res = await dramaApiService.getList({ typeId, page, limit: 24 })
+  const res = await dramaApiService.getList({ typeId, page, limit: 10 })
 
   const details = await Promise.all(res.list.map((item) => dramaApiService.getDetail({ id: item.id })))
 

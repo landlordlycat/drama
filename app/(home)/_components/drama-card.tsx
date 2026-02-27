@@ -10,7 +10,7 @@ export default function DramaCard({ item }: DramaCardProps) {
     <Link href={`/detail/${item.id}`} className="group">
       <article className="flex flex-col relative overflow-hidden rounded-lg transition-transform duration-300 group-hover:scale-105 border">
         <div className="relative aspect-[2/3] w-full">
-          <Image loading="eager" src={item.cover || "/placeholder.png"} alt={item.title} fill className="object-cover" sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 10vw" />
+          <Image loading="eager" src={item.cover || "/logo.svg"} alt={item.title} fill className="object-cover" sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 10vw" />
 
           {/* 渐变蒙版和文字容器 */}
           <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/80 via-black/40 to-transparent p-3 pt-8">

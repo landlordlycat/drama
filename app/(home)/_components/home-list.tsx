@@ -2,7 +2,7 @@ import DramaCard from "./drama-card"
 import { dramaApiService } from "@/lib/services/drama-api"
 import { Pagination } from "@/components/pagination"
 import { AlertCircle, RefreshCw } from "lucide-react"
-import { DetailResponse, ListResponse } from "@/lib/types/api"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface HomeListProps {
   page?: number
@@ -24,42 +24,44 @@ function ErrorDisplay({ message }: { message: string }) {
   )
 }
 
-async function fetchHomeData(page: number): Promise<{
-  list: ListResponse | null
-  details: (DetailResponse | null)[]
-  error: string | null
-}> {
-  try {
-    const res = await dramaApiService.getList({ page, limit: 24 })
-    const details = await Promise.all((res.list ?? []).map((item) => dramaApiService.getDetail({ id: item.id }).catch(() => null)))
-    return { list: res, details, error: null }
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "发生未知错误，请稍后重试"
-    return { list: null, details: [], error: message }
-  }
+function DramaCardSkeleton() {
+  return (
+    <div className="space-y-2">
+      <Skeleton className="aspect-[2/3] w-full rounded-lg" />
+      <Skeleton className="h-4 w-3/4" />
+      <Skeleton className="h-3 w-1/2" />
+    </div>
+  )
+}
+
+async function DramaCardWrapper({ id }: { id: number }) {
+  const detail = await dramaApiService.getDetail({ id })
+  if (!detail) return <DramaCardSkeleton />
+  return <DramaCard item={detail} />
 }
 
 export default async function HomeList({ page = 1 }: HomeListProps) {
-  const { list, details, error } = await fetchHomeData(page)
-
-  if (error) {
-    return <ErrorDisplay message={error} />
+  let list
+  try {
+    const res = await dramaApiService.getList({ page, limit: 10 })
+    list = res
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "发生未知错误，请稍后重试"
+    return <ErrorDisplay message={message} />
   }
 
-  const validDetails = details.filter((d): d is NonNullable<typeof d> => d !== null)
-
-  if (validDetails.length === 0) {
+  if (!list?.list || list.list.length === 0) {
     return <ErrorDisplay message="暂无数据" />
   }
 
   return (
     <>
       <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-        {validDetails.map((detailItem) => (
-          <DramaCard key={detailItem.id} item={detailItem} />
+        {list.list.map((item) => (
+          <DramaCardWrapper key={item.id} id={item.id} />
         ))}
       </div>
-      <Pagination currentPage={page} totalPages={list?.pageCount ?? 1} basePath="/" />
+      <Pagination currentPage={page} totalPages={list.pageCount ?? 1} basePath="/" />
     </>
   )
 }
