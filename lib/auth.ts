@@ -8,6 +8,7 @@ export const auth = betterAuth({
     provider: "pg", // or "mysql", "sqlite"
     schema,
   }),
+
   emailAndPassword: {
     enabled: true,
     async sendResetPassword(data, request) {

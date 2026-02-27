@@ -22,13 +22,13 @@ export default function SignIn() {
     <div className="flex items-center justify-center min-h-screen">
       <Card className="max-w-md flex-1">
         <CardHeader>
-          <CardTitle className="text-lg md:text-xl">Sign In</CardTitle>
-          <CardDescription className="text-xs md:text-sm">Enter your email below to login to your account</CardDescription>
+          <CardTitle className="text-lg md:text-xl">登录</CardTitle>
+          <CardDescription className="text-xs md:text-sm">在下面输入您的电子邮件以登录您的帐户</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">邮箱</Label>
               <Input
                 id="email"
                 type="email"
@@ -43,9 +43,9 @@ export default function SignIn() {
 
             <div className="grid gap-2">
               <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">密码</Label>
                 <Link href="#" className="ml-auto inline-block text-sm underline">
-                  Forgot your password?
+                  忘记密码?
                 </Link>
               </div>
 
@@ -58,7 +58,7 @@ export default function SignIn() {
                   setRememberMe(!rememberMe)
                 }}
               />
-              <Label htmlFor="remember">Remember me</Label>
+              <Label htmlFor="remember">记住我</Label>
 
               <Link href="/sign-up" className="ml-auto">
                 <Button variant="link" className="text-xs">
@@ -87,8 +87,8 @@ export default function SignIn() {
                       //登录成功
                       toast.success("登录成功")
                     },
-                    onError: (ctx) => {
-                      toast.error(ctx.error.message)
+                    onError: () => {
+                      toast.error("账户或密码错误")
                     },
                   },
                 })
@@ -96,7 +96,7 @@ export default function SignIn() {
             >
               {loading ?
                 <Loader2 size={16} className="animate-spin" />
-              : <p>Login</p>}
+              : <p>登录</p>}
             </Button>
             <div className={cn("w-full gap-2 flex items-center", "justify-between flex-col")}>
               <Button

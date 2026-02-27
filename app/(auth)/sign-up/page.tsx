@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation"
 export default function SignUp() {
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
+
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [passwordConfirmation, setPasswordConfirmation] = useState("")
@@ -38,12 +39,12 @@ export default function SignUp() {
     <div className="flex items-center justify-center min-h-screen">
       <Card className="z-50 rounded-md rounded-t-none max-w-md flex-1">
         <CardHeader>
-          <CardTitle className="text-lg md:text-xl">Sign Up</CardTitle>
-          <CardDescription className="text-xs md:text-sm">Enter your information to create an account</CardDescription>
+          <CardTitle className="text-lg md:text-xl">注册</CardTitle>
+          <CardDescription className="text-xs md:text-sm"> 请输入您的个人信息 </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4">
-            <div className="grid grid-cols-2 gap-4">
+            {/* <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="first-name">First name</Label>
                 <Input
@@ -68,9 +69,20 @@ export default function SignUp() {
                   value={lastName}
                 />
               </div>
+            </div> */}
+            <div className="grid gap-2">
+              <Label htmlFor="name">昵称</Label>
+              <Input
+                id="name"
+                placeholder="昵称"
+                onChange={(e) => {
+                  setFirstName(e.target.value)
+                }}
+                value={firstName}
+              />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">邮箱</Label>
               <Input
                 id="email"
                 type="email"
@@ -83,11 +95,11 @@ export default function SignUp() {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">密码</Label>
               <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" placeholder="Password" />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="password_confirmation">Confirm Password</Label>
+              <Label htmlFor="password_confirmation">确认密码</Label>
               <Input
                 id="password_confirmation"
                 type="password"
@@ -98,7 +110,7 @@ export default function SignUp() {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="image">Profile Image (optional)</Label>
+              <Label htmlFor="image">头像 (可选)</Label>
               <div className="flex items-end gap-4">
                 {imagePreview && (
                   <div className="relative w-16 h-16 rounded-sm overflow-hidden">
@@ -127,7 +139,8 @@ export default function SignUp() {
                 await signUp.email({
                   email,
                   password,
-                  name: `${firstName} ${lastName}`,
+                  // name: `${firstName} ${lastName}`,
+                  name: firstName,
                   image: image ? await convertImageToBase64(image) : "",
                   callbackURL: "/dashboard",
                   fetchOptions: {
@@ -149,9 +162,12 @@ export default function SignUp() {
             >
               {loading ?
                 <Loader2 size={16} className="animate-spin" />
-              : "Create your account"}
+              : "注册"}
             </Button>
           </div>
+          <span className="text-sm mt-3 block text-muted-foreground cursor-pointer" onClick={() => router.push("/sign-in")}>
+            已有账号？ 登录
+          </span>
         </CardContent>
       </Card>
     </div>
