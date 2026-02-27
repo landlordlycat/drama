@@ -1,12 +1,13 @@
+"use client"
+
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "./_components/app-sidebar"
 import { UserDropdown } from "./_components/user-dropdown"
 import { ModeToggle } from "@/components/mode-toggle"
 
-export default async function Layout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      {/* sidebar */}
       <AppSidebar />
       <SidebarInset>
         {/* header */}

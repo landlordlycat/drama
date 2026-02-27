@@ -4,10 +4,10 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Separator } from "@/components/ui/separator"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarRail } from "@/components/ui/sidebar"
-import { LayoutDashboard, Users, Settings, EqualApproximatelyIcon, Mail, Cat, UserRoundCog } from "lucide-react"
+import { LayoutDashboard, Settings, Mail, UserRoundCog, Github } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useSession } from "@/lib/auth-client"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { useSession } from "@/lib/auth-client"
 
 const menuItems = [
   {
@@ -30,7 +30,7 @@ const menuItems = [
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const { data: session } = useSession()
-  console.log(session)
+
   return (
     <Sidebar collapsible="icon" {...props}>
       {/* header */}
@@ -79,24 +79,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <div className="flex items-center text-gray-500 px-2 py-1">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span>{session?.user.name || "Biscuit"}</span>
+                  <span>{session?.user?.name || "Biscuit"}</span>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <span>{session?.user.email || "Biscuit"}</span>
+                  <span>{session?.user?.email || "Biscuit"}</span>
                 </TooltipContent>
               </Tooltip>
               <div className="flex ml-auto">
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  onAbort={() => {
-                    // mailto:xxxx@qq.com
-                  }}
-                >
-                  <Mail />
+                <Button variant="ghost" size="icon-sm" asChild>
+                  <a href="mailto:duimiansima@outlook.com">
+                    <Mail />
+                  </a>
                 </Button>
-                <Button variant="ghost" size="icon-sm">
-                  <Cat />
+                <Button variant="ghost" size="icon-sm" asChild>
+                  <a href="https://github.com/landlordlycat/drama" target="_blank" rel="noopener noreferrer">
+                    <Github />
+                  </a>
                 </Button>
               </div>
             </div>

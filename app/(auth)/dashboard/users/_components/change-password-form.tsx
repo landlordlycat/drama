@@ -65,15 +65,39 @@ export function ChangePasswordForm() {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="current-password">当前密码</Label>
-        <Input id="current-password" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} placeholder="请输入当前密码" required />
+        <Input
+          id="current-password"
+          type="password"
+          value={currentPassword}
+          onChange={(e) => setCurrentPassword(e.target.value)}
+          placeholder="请输入当前密码"
+          autoComplete="current-password"
+          required
+        />
       </div>
       <div className="space-y-2">
         <Label htmlFor="new-password">新密码</Label>
-        <Input id="new-password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="请输入新密码" required />
+        <Input
+          id="new-password"
+          type="password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          placeholder="请输入新密码"
+          autoComplete="new-password"
+          required
+        />
       </div>
       <div className="space-y-2">
         <Label htmlFor="confirm-password">确认新密码</Label>
-        <Input id="confirm-password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="请再次输入新密码" required />
+        <Input
+          id="confirm-password"
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="请再次输入新密码"
+          autoComplete="new-password"
+          required
+        />
       </div>
       <Button type="submit" disabled={isLoading || !currentPassword || !newPassword || !confirmPassword}>
         {isLoading && <Loader2 className="mr-2 size-4 animate-spin" />}
