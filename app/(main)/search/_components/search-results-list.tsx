@@ -1,5 +1,5 @@
 import { dramaApiService } from "@/lib/services/drama-api"
-import DramaCard from "@/app/(home)/_components/drama-card"
+import DramaCard from "@/app/(main)/_components/drama-card"
 import { Search } from "lucide-react"
 import { Pagination } from "@/components/pagination"
 

@@ -17,7 +17,6 @@ export default function Categories({ searchParams }: { searchParams: Promise<{ t
       <Suspense fallback={<div className="h-16" />}>
         <DramaHeader />
       </Suspense>
-
       <main className="max-w-300 mx-auto px-4 md:px-10">
         <Suspense fallback={<div className="h-14" />}>
           <CategoriesContent searchParams={searchParams} />
@@ -27,11 +26,7 @@ export default function Categories({ searchParams }: { searchParams: Promise<{ t
   )
 }
 
-async function CategoriesContent({
-  searchParams,
-}: {
-  searchParams: Promise<{ typeId?: string; page?: string }>
-}) {
+async function CategoriesContent({ searchParams }: { searchParams: Promise<{ typeId?: string; page?: string }> }) {
   const { typeId, page } = await searchParams
   const typesRes = await dramaApiService.getTypes({})
 

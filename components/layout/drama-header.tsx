@@ -25,11 +25,18 @@ export default function DramaHeader() {
         <div className="flex items-center gap-8 flex-1">
           <Logo />
           <nav className="hidden md:flex items-center gap-7 text-sm font-medium">
-            {NavCategories.map((category) => (
-              <Link key={category.title} href={category.href} className="transition-colors hover:text-primary">
-                {category.title}
-              </Link>
-            ))}
+            {NavCategories.map((category) => {
+              const isActive = pathname === category.href || (category.href !== "/" && pathname.startsWith(category.href))
+              return (
+                <Link
+                  key={category.title}
+                  href={category.href}
+                  className={`transition-colors ${isActive ? "text-primary font-semibold" : "hover:text-primary"}`}
+                >
+                  {category.title}
+                </Link>
+              )
+            })}
           </nav>
         </div>
 

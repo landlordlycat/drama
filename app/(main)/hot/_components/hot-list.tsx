@@ -1,4 +1,4 @@
-import DramaCard from "@/app/(home)/_components/drama-card"
+import DramaCard from "@/app/(main)/_components/drama-card"
 import { dramaApiService } from "@/lib/services/drama-api"
 import { Pagination } from "@/components/pagination"
 
