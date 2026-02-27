@@ -34,8 +34,16 @@ export default async function ProfilePage() {
     </div>
   )
 }
+interface ProfileFormProps {
+  user: {
+    id: string
+    name?: string | null
+    email?: string | null
+    image?: string | null
+  }
+}
 
-function UserInfoCard({ user }: { user: any }) {
+function UserInfoCard({ user }: ProfileFormProps) {
   return (
     <div className="rounded-xl border bg-card p-6">
       <div className="flex items-center gap-4 pb-4 border-b">
