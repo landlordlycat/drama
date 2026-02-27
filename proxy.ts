@@ -8,7 +8,7 @@ export async function proxy(request: NextRequest) {
   })
 
   // 已登录用户访问登录/注册页面，重定向到首页
-  if (session && !request.nextUrl.pathname.startsWith("/dashboard")) {
+  if (session && (request.nextUrl.pathname === "/sign-in" || request.nextUrl.pathname === "/sign-up")) {
     return NextResponse.redirect(new URL("/", request.url))
   }
 
