@@ -9,20 +9,21 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { LogOutIcon, UserIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Button } from "../ui/button"
-import { toast } from "sonner"
+import { useState } from "react"
 
 export default function UserAvatar() {
   const { data: session } = authClient.useSession()
+  const [open, setOpen] = useState(false)
   const router = useRouter()
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
           {session ?
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar className="cursor-pointer">
-                <AvatarImage src={session?.user.image || "https://github.com/evilrabbit.png"} alt="@evilrabbit" />
+                <AvatarImage className="object-cover" src={session?.user.image || "https://github.com/evilrabbit.png"} alt="@evilrabbit" />
                 <AvatarFallback>登录</AvatarFallback>
               </Avatar>
             </Button>
@@ -38,6 +39,8 @@ export default function UserAvatar() {
             <DropdownMenuItem
               onSelect={(e) => {
                 e.preventDefault()
+                // 关闭下拉菜单
+                setOpen(false)
                 router.push("/dashboard")
               }}
             >

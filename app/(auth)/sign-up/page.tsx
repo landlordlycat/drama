@@ -10,6 +10,7 @@ import { Loader2, X } from "lucide-react"
 import { signUp } from "@/lib/auth-client"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
+import { auth } from "@/lib/auth"
 
 export default function SignUp() {
   const [firstName, setFirstName] = useState("")
