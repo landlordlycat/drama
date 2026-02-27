@@ -11,9 +11,9 @@ import GlobalSearch from "./global-search"
 import { Home, LayoutGrid, Flame } from "lucide-react"
 
 const navIcons = {
-  "首页": Home,
-  "分类": LayoutGrid,
-  "热门": Flame,
+  首页: Home,
+  分类: LayoutGrid,
+  热门: Flame,
 }
 
 export default function DramaHeader() {
@@ -50,9 +50,7 @@ export default function DramaHeader() {
               <Link
                 key={category.title}
                 href={category.href}
-                className={`flex flex-col items-center justify-center gap-1 px-4 py-1 transition-colors ${
-                  isActive ? "text-primary" : "text-muted-foreground"
-                }`}
+                className={`flex flex-col items-center justify-center gap-1 px-4 py-1 transition-colors ${isActive ? "text-primary" : "text-muted-foreground"}`}
               >
                 {Icon && <Icon className="h-5 w-5" />}
                 <span className="text-xs font-medium">{category.title}</span>

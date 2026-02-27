@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 
 import { ThemeProvider } from "@/components/theme-provier"
+import { Toaster } from "sonner"
 
 import "@/styles/globals.css"
 
@@ -46,6 +47,7 @@ export default function RootLayout({
     <html lang="zh-CN" suppressHydrationWarning>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Toaster position="top-center" richColors />
           <div className="min-h-screen max-w-300 mx-auto pb-16 md:pb-0">
             {modal}
             {children}
