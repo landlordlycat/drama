@@ -9,10 +9,7 @@ export const metadata: Metadata = {
   description: "最受欢迎的热门短剧推荐，精选优质内容，发现精彩剧集。",
 }
 
-export default async function HotPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
-  const { page } = await searchParams
-  const currentPage = page ? Number(page) : 1
-
+export default function HotPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
   return (
     <div className="min-h-screen bg-background">
       <DramaHeader />
@@ -24,11 +21,18 @@ export default async function HotPage({ searchParams }: { searchParams: Promise<
         </div>
 
         <Suspense fallback={<HotSkeleton />}>
-          <HotList page={currentPage} />
+          <HotContent searchParams={searchParams} />
         </Suspense>
       </main>
     </div>
   )
+}
+
+async function HotContent({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+  const { page } = await searchParams
+  const currentPage = page ? Number(page) : 1
+
+  return <HotList page={currentPage} />
 }
 
 function HotSkeleton() {

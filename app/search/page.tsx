@@ -9,29 +9,36 @@ export const metadata: Metadata = {
   description: "搜索您感兴趣的短剧，快速找到想看的内容。",
 }
 
-export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string; page?: string }> }) {
-  const { q = "", page } = await searchParams
-  const currentPage = page ? Number(page) : 1
-
+export default function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string; page?: string }> }) {
   return (
     <div className="min-h-screen bg-background">
       <DramaHeader />
 
       <main className="max-w-300 mx-auto px-4 md:px-10 py-8">
         <div className="flex flex-col gap-8">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">搜索结果</h1>
-            <p className="text-muted-foreground">
-              关键词: <span className="text-foreground font-medium">{q}</span>
-            </p>
-          </div>
-
           <Suspense fallback={<SearchSkeleton />}>
-            <SearchResultsList query={q} page={currentPage} />
+            <SearchContent searchParams={searchParams} />
           </Suspense>
         </div>
       </main>
     </div>
+  )
+}
+
+async function SearchContent({ searchParams }: { searchParams: Promise<{ q?: string; page?: string }> }) {
+  const { q = "", page } = await searchParams
+  const currentPage = page ? Number(page) : 1
+
+  return (
+    <>
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight">搜索结果</h1>
+        <p className="text-muted-foreground">
+          关键词: <span className="text-foreground font-medium">{q}</span>
+        </p>
+      </div>
+      <SearchResultsList query={q} page={currentPage} />
+    </>
   )
 }
 
