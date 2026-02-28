@@ -63,6 +63,7 @@ export function ChangePasswordForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <input type="text" name="username" autoComplete="username" style={{ display: "none" }} aria-hidden="true" />
       <div className="space-y-2">
         <Label htmlFor="current-password">当前密码</Label>
         <Input
