@@ -1,14 +1,16 @@
-import DramaHeader from "@/components/layout/drama-header"
+﻿import DramaHeader from "@/components/layout/drama-header"
 import { dramaApiService } from "@/lib/services/drama-api"
 import { Suspense } from "react"
 import CategoryFilter from "./_components/category-filter"
 import CategoryList from "./_components/category-list"
 import { Skeleton } from "@/components/ui/skeleton"
 import type { Metadata } from "next"
+import { redirect } from "next/navigation"
+import { filterVisibleTypes, flattenTypeIds, getHiddenTypeIds } from "@/lib/category-visibility.server"
 
 export const metadata: Metadata = {
   title: "分类浏览",
-  description: "按类型浏览短剧，发现您喜欢的内容。支持多种分类筛选，快速找到感兴趣的短剧。",
+  description: "按类型浏览内容",
 }
 
 export default function Categories({ searchParams }: { searchParams: Promise<{ typeId?: string; page?: string }> }) {
@@ -31,15 +33,31 @@ async function CategoriesContent({ searchParams }: { searchParams: Promise<{ typ
   const defaultSource = await dramaApiService.getDefaultSource()
   const typesRes = await dramaApiService.getTypes({ source: defaultSource.name })
 
+  const hiddenIds = await getHiddenTypeIds(defaultSource.name)
+  const visibleTypes = filterVisibleTypes(typesRes.types, new Set(hiddenIds))
+  const visibleTypeIds = new Set(flattenTypeIds(visibleTypes))
+  const firstVisibleTypeId = visibleTypes[0]?.id
+
+  if (firstVisibleTypeId) {
+    const currentId = Number(typeId)
+    if (!typeId || !Number.isInteger(currentId) || !visibleTypeIds.has(currentId)) {
+      redirect(`/categories?typeId=${firstVisibleTypeId}`)
+    }
+  }
+
   return (
     <>
       <Suspense>
-        <CategoryFilter types={typesRes.types} />
+        <CategoryFilter types={visibleTypes} />
       </Suspense>
 
-      <Suspense fallback={<CategorySkeleton />}>
-        <CategoryList typeId={typeId ? Number(typeId) : undefined} page={page ? Number(page) : 1} defaultSource={defaultSource} />
-      </Suspense>
+      {typeId && visibleTypeIds.has(Number(typeId)) ? (
+        <Suspense fallback={<CategorySkeleton />}>
+          <CategoryList typeId={Number(typeId)} page={page ? Number(page) : 1} defaultSource={defaultSource} />
+        </Suspense>
+      ) : (
+        <div className="py-10 text-sm text-muted-foreground">暂无可显示分类</div>
+      )}
     </>
   )
 }

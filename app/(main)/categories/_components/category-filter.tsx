@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { TypeItem } from "@/lib/types/api"
 import { cn } from "@/lib/utils"
@@ -25,16 +25,13 @@ export default function CategoryFilter({ types }: CategoryFilterProps) {
     } else {
       params.delete("typeId")
     }
-    // 切换分类时重置到第一页
     params.delete("page")
 
-    // 使用 startTransition 标记为非阻塞跳转，让 UI 保持响应
     startTransition(() => {
-      router.push(`/categories?${params.toString()}`)
+      router.push(`/categories${params.toString() ? `?${params.toString()}` : ""}`)
     })
   }
 
-  // 检查某个主分类及其子分类是否被选中
   const isTypeSelected = (type: TypeItem) => {
     if (currentTypeId === type.id.toString()) return true
     return type.children?.some((child) => child.id.toString() === currentTypeId)
@@ -45,26 +42,19 @@ export default function CategoryFilter({ types }: CategoryFilterProps) {
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2 text-primary">
           <LayoutGrid className="w-5 h-5" />
-          <h2 className="text-lg font-bold tracking-tight">影片分类</h2>
+          <h2 className="text-lg font-bold tracking-tight">分类</h2>
           {isPending && <Loader2 className="w-4 h-4 animate-spin ml-2 opacity-50" />}
         </div>
 
         <div className="bg-muted/30 p-4 rounded-2xl border border-border/50">
-          <div className="flex items-start gap-4">
-            <div className="flex items-center gap-2 mt-2 text-muted-foreground shrink-0">
+          <div className="flex gap-4 items-center">
+            <div className="flex items-center gap-2 text-muted-foreground shrink-0">
               <Tags className="w-4 h-4" />
               <span className="text-sm font-medium">类型:</span>
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant={currentTypeId === "" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => handleTypeClick("")}
-                className={cn("rounded-full px-5 h-9", currentTypeId === "" ? "shadow-none" : "hover:bg-background/80")}
-              >
-                全部
-              </Button>
+            <div className="flex flex-wrap gap-2 items-center">
+              {types.length === 0 && <p className="text-sm text-muted-foreground">暂无可显示分类</p>}
 
               {types.map((type) => {
                 const hasChildren = type.children && type.children.length > 0

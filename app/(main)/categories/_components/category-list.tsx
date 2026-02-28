@@ -10,6 +10,10 @@ interface CategoryListProps {
 }
 
 export default async function CategoryList({ typeId, page = 1, defaultSource }: CategoryListProps) {
+  if (!typeId) {
+    return null
+  }
+
   const res = await dramaApiService.getList({ typeId, page, limit: 10, source: defaultSource?.name ?? "" })
 
   const details = await Promise.all(res.list.map((item) => dramaApiService.getDetail({ id: item.id, source: defaultSource?.name })))
