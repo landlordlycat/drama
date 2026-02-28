@@ -24,7 +24,7 @@ const menuGroups: MenuGroup[] = [
       },
       {
         title: "分类管理",
-        url: "/dashboard/tags",
+        url: "/dashboard/categories",
         icon: Shapes,
       },
       {
