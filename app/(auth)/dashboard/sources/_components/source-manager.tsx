@@ -53,8 +53,6 @@ export function SourceManager() {
           health: "unknown" as HealthStatus,
         }))
         setSources(sourcesWithHealth)
-        // 自动开始健康检测
-        sourcesWithHealth.forEach((s) => checkHealth(s))
       }
     } catch (error) {
       toast.error("加载源列表失败")
