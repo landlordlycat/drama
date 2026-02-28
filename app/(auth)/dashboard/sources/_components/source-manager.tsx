@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { toast } from "sonner"
 import { Loader2, Plus, MoreVertical, Star, Pencil, Trash2, Globe, Clock, MessageSquare, RefreshCw } from "lucide-react"
-import type { Source, CreateSourceInput, UpdateSourceInput } from "@/lib/types/source"
+import type { Source, CreateSourceInput } from "@/lib/types/source"
 
 type HealthStatus = "unknown" | "checking" | "healthy" | "unhealthy"
 
@@ -66,9 +66,7 @@ export function SourceManager() {
   // 健康检测
   const checkHealth = async (source: SourceWithHealth) => {
     // 更新状态为检测中
-    setSources((prev) =>
-      prev.map((s) => (s.id === source.id ? { ...s, health: "checking" } : s))
-    )
+    setSources((prev) => prev.map((s) => (s.id === source.id ? { ...s, health: "checking" } : s)))
 
     try {
       // 通过 API 代理进行健康检测，避免 CORS 问题
@@ -76,16 +74,12 @@ export function SourceManager() {
       const data = await res.json()
 
       if (data.healthy) {
-        setSources((prev) =>
-          prev.map((s) => (s.id === source.id ? { ...s, health: "healthy" } : s))
-        )
+        setSources((prev) => prev.map((s) => (s.id === source.id ? { ...s, health: "healthy" } : s)))
       } else {
         throw new Error(data.message || "检测失败")
       }
     } catch (error) {
-      setSources((prev) =>
-        prev.map((s) => (s.id === source.id ? { ...s, health: "unhealthy" } : s))
-      )
+      setSources((prev) => prev.map((s) => (s.id === source.id ? { ...s, health: "unhealthy" } : s)))
     }
   }
 
