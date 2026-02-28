@@ -1,7 +1,7 @@
 "use client"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { authClient } from "@/lib/auth-client"
+import { useSession, signOut } from "@/lib/auth-client"
 // import { useAuth } from "@/components/auth-provider"
 import Link from "next/link"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu"
@@ -12,7 +12,7 @@ import { Button } from "../ui/button"
 import { useState } from "react"
 
 export default function UserAvatar() {
-  const { data: session } = authClient.useSession()
+  const { data: session } = useSession()
   const [open, setOpen] = useState(false)
   const router = useRouter()
 
@@ -53,7 +53,7 @@ export default function UserAvatar() {
               variant="destructive"
               onSelect={(e) => {
                 e.preventDefault()
-                authClient.signOut()
+                signOut()
               }}
             >
               <LogOutIcon />
