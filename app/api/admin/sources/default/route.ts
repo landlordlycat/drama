@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 const API_BASE = process.env.API_BASE_URL || "https://api.bff.cc.cd"
 
 // 获取默认源
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const res = await fetch(`${API_BASE}/sources/default`)
     if (!res.ok) {

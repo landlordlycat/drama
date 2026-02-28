@@ -1,5 +1,7 @@
 import { API_CONFIG } from "@/config/index"
 import { DetailParams, DetailResponse, HotParams, HotResponse, ListParams, ListResponse, SearchParams, SearchResponse, TypesParams, TypesResponse } from "../types/api"
+import { Source } from "../types/source"
+import { da } from "date-fns/locale"
 
 export class ApiService {
   private buildUrl(path: string, params?: object): string {
@@ -15,7 +17,8 @@ export class ApiService {
   }
   //获取列表
   async getList(params?: ListParams): Promise<ListResponse> {
-    const url = this.buildUrl("/list", params)
+    const defaultSource = await this.getDefaultSource()
+    const url = this.buildUrl("/list", { ...params, source: defaultSource.name })
     const res = await fetch(url)
 
     if (!res.ok) {
@@ -26,7 +29,8 @@ export class ApiService {
   }
   //搜索视频
   async search(params: SearchParams): Promise<SearchResponse> {
-    const url = this.buildUrl("/search", params)
+    const defaultSource = await this.getDefaultSource()
+    const url = this.buildUrl("/search", { ...params, source: defaultSource.name })
     const res = await fetch(url)
 
     if (!res.ok) {
@@ -52,7 +56,9 @@ export class ApiService {
   }
 
   async getHot(params?: HotParams): Promise<HotResponse> {
-    const url = this.buildUrl("/hot", params)
+    const defaultSource = await this.getDefaultSource()
+
+    const url = this.buildUrl("/hot", { ...params, source: defaultSource.name })
     const res = await fetch(url, {
       next: { revalidate: 1800 },
     })
@@ -65,7 +71,8 @@ export class ApiService {
   }
 
   async getTypes(params?: TypesParams): Promise<TypesResponse> {
-    const url = this.buildUrl("/types", params)
+    const defaultSource = await this.getDefaultSource()
+    const url = this.buildUrl("/types", { ...params, source: defaultSource.name })
     const res = await fetch(url, {
       next: { revalidate: 86400 }, // 类型数据缓存时间更长
     })
@@ -75,6 +82,19 @@ export class ApiService {
     }
 
     return res.json()
+  }
+
+  //获取默认源
+  async getDefaultSource(): Promise<Source> {
+    const url = this.buildUrl("/sources/default")
+    const res = await fetch(url)
+
+    if (!res.ok) {
+      throw new Error(`API request failed: ${res.status}`)
+    }
+    const { data } = await res.json()
+
+    return data
   }
 }
 

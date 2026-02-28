@@ -46,10 +46,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         message: "响应不是有效的 JSON",
       })
     }
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json({
       healthy: false,
-      message: error.name === "AbortError" ? "请求超时" : "检测失败",
+      message: error instanceof Error && error.name === "AbortError" ? "请求超时" : "检测失败",
     })
   }
 }

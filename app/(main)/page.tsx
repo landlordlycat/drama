@@ -3,6 +3,7 @@ import { Suspense } from "react"
 import HomeList from "./_components/home-list"
 import HomeLoading from "./loading"
 import { Metadata } from "next"
+import { dramaApiService } from "@/lib/services/drama-api"
 
 export const metadata: Metadata = {
   title: "Drama - 精彩短剧在线观看",
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 export default async function Home({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
   const { page } = await searchParams
   const currentPage = page ? Number(page) : 1
+  const defaultSource = await dramaApiService.getDefaultSource()
 
   return (
     <main className="min-h-screen ">
@@ -20,7 +22,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ p
         {/* drama content */}
         <section className="px-6 sm:px-10 py-10">
           <Suspense fallback={<HomeLoading />}>
-            <HomeList page={currentPage} />
+            <HomeList page={currentPage} defaultSource={defaultSource} />
           </Suspense>
         </section>
       </div>
