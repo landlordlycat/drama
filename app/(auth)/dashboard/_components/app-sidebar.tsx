@@ -4,26 +4,43 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Separator } from "@/components/ui/separator"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarRail } from "@/components/ui/sidebar"
-import { LayoutDashboard, Settings, Mail, UserRoundCog, Github } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
+import { LayoutDashboard, Settings, Mail, Github } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useSession } from "@/lib/auth-client"
 
-const menuItems = [
+interface MenuItem {
+  title: string
+  url: string
+  icon: LucideIcon
+}
+
+interface MenuGroup {
+  title: string
+  children: MenuItem[]
+}
+
+const menuGroups: MenuGroup[] = [
   {
-    title: "概览",
-    url: "/dashboard",
-    icon: LayoutDashboard,
+    title: "常用",
+    children: [
+      {
+        title: "概览",
+        url: "/dashboard",
+        icon: LayoutDashboard,
+      },
+    ],
   },
   {
-    title: "用户",
-    url: "/dashboard/users",
-    icon: UserRoundCog,
-  },
-  {
-    title: "设置",
-    url: "/dashboard/profile",
-    icon: Settings,
+    title: "系统",
+    children: [
+      {
+        title: "设置",
+        url: "/dashboard/profile",
+        icon: Settings,
+      },
+    ],
   },
 ]
 
@@ -54,21 +71,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       {/* content */}
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>常用</SidebarGroupLabel>
-          <SidebarMenu>
-            {menuItems.map((item) => (
-              <SidebarMenuItem key={item.url}>
-                <SidebarMenuButton asChild isActive={pathname === item.url} tooltip={item.title}>
-                  <Link href={item.url}>
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarGroup>
+        {menuGroups.map((group) => (
+          <SidebarGroup key={group.title}>
+            <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
+            <SidebarMenu>
+              {group.children.map((item) => (
+                <SidebarMenuItem key={item.url}>
+                  <SidebarMenuButton asChild isActive={pathname === item.url} tooltip={item.title}>
+                    <Link href={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
 
       {/* footer */}
