@@ -57,7 +57,7 @@ export interface ListResponse {
   page: number
   pageCount: number
   total: number
-  typeName: string
+  typeName?: string
   list: DramaList[]
 }
 

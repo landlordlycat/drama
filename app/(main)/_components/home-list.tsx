@@ -44,7 +44,11 @@ async function DramaCardWrapper({ id }: { id: number }) {
 export default async function HomeList({ page = 1 }: HomeListProps) {
   let list
   try {
-    const res = await dramaApiService.getList({ page, limit: 10 })
+    // 获取默认源
+    const defaultSource = await dramaApiService.getDefaultSource()
+    console.log(defaultSource)
+    const res = await dramaApiService.getList({ page, limit: 10, source: defaultSource })
+    console.log(res)
     list = res
   } catch (error) {
     const message = error instanceof Error ? error.message : "发生未知错误，请稍后重试"
