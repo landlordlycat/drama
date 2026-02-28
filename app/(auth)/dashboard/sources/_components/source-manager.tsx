@@ -7,25 +7,20 @@ import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { toast } from "sonner"
-import { Loader2, Plus, MoreVertical, Star, Pencil, Trash2, Globe, Clock, MessageSquare } from "lucide-react"
+import { Loader2, Plus, MoreVertical, Star, Pencil, Trash2, Globe, Clock, MessageSquare, RefreshCw } from "lucide-react"
 import type { Source, CreateSourceInput, UpdateSourceInput } from "@/lib/types/source"
 
+type HealthStatus = "unknown" | "checking" | "healthy" | "unhealthy"
+
+interface SourceWithHealth extends Source {
+  health: HealthStatus
+}
+
 export function SourceManager() {
-  const [sources, setSources] = useState<Source[]>([])
+  const [sources, setSources] = useState<SourceWithHealth[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
 
@@ -53,13 +48,50 @@ export function SourceManager() {
       const res = await fetch("/api/admin/sources")
       const data = await res.json()
       if (data.data) {
-        setSources(data.data)
+        const sourcesWithHealth: SourceWithHealth[] = data.data.map((s: Source) => ({
+          ...s,
+          health: "unknown" as HealthStatus,
+        }))
+        setSources(sourcesWithHealth)
+        // 自动开始健康检测
+        sourcesWithHealth.forEach((s) => checkHealth(s))
       }
     } catch (error) {
       toast.error("加载源列表失败")
     } finally {
       setLoading(false)
     }
+  }
+
+  // 健康检测
+  const checkHealth = async (source: SourceWithHealth) => {
+    // 更新状态为检测中
+    setSources((prev) =>
+      prev.map((s) => (s.id === source.id ? { ...s, health: "checking" } : s))
+    )
+
+    try {
+      // 通过 API 代理进行健康检测，避免 CORS 问题
+      const res = await fetch(`/api/admin/sources/${source.id}/health?url=${encodeURIComponent(source.url)}&timeout=${source.timeout}`)
+      const data = await res.json()
+
+      if (data.healthy) {
+        setSources((prev) =>
+          prev.map((s) => (s.id === source.id ? { ...s, health: "healthy" } : s))
+        )
+      } else {
+        throw new Error(data.message || "检测失败")
+      }
+    } catch (error) {
+      setSources((prev) =>
+        prev.map((s) => (s.id === source.id ? { ...s, health: "unhealthy" } : s))
+      )
+    }
+  }
+
+  // 重新检测所有源
+  const checkAllHealth = () => {
+    sources.forEach((s) => checkHealth(s))
   }
 
   // 打开添加对话框
@@ -155,9 +187,7 @@ export function SourceManager() {
       })
       if (!res.ok) throw new Error()
       // 乐观更新
-      setSources((prev) =>
-        prev.map((s) => (s.id === source.id ? { ...s, is_enabled: newEnabled } : s))
-      )
+      setSources((prev) => prev.map((s) => (s.id === source.id ? { ...s, is_enabled: newEnabled } : s)))
       toast.success(newEnabled === 1 ? "已启用" : "已禁用")
     } catch (error) {
       toast.error("操作失败")
@@ -178,7 +208,7 @@ export function SourceManager() {
         prev.map((s) => ({
           ...s,
           is_default: s.id === source.id ? 1 : 0,
-        }))
+        })),
       )
       toast.success(`已将 ${source.name} 设为默认源`)
     } catch (error) {
@@ -202,10 +232,16 @@ export function SourceManager() {
           <p className="text-sm text-muted-foreground">
             共 {sources.length} 个播放源，{sources.filter((s) => s.is_enabled === 1).length} 个已启用
           </p>
-          <Button onClick={openAddDialog}>
-            <Plus className="mr-1 size-4" />
-            添加源
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={checkAllHealth}>
+              <RefreshCw className="mr-1 size-4" />
+              重新检测
+            </Button>
+            <Button onClick={openAddDialog}>
+              <Plus className="mr-1 size-4" />
+              添加源
+            </Button>
+          </div>
         </div>
 
         {/* 源列表 */}
@@ -215,6 +251,8 @@ export function SourceManager() {
               <CardHeader className="py-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
+                    {/* 健康状态指示器 */}
+                    <HealthIndicator status={source.health} />
                     <CardTitle className="text-base font-medium">{source.name}</CardTitle>
                     {source.is_default === 1 && (
                       <Badge variant="default" className="text-xs">
@@ -229,13 +267,8 @@ export function SourceManager() {
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">
-                      {source.is_enabled === 1 ? "已启用" : "已禁用"}
-                    </span>
-                    <Switch
-                      checked={source.is_enabled === 1}
-                      onCheckedChange={() => toggleEnabled(source)}
-                    />
+                    <span className="text-xs text-muted-foreground">{source.is_enabled === 1 ? "已启用" : "已禁用"}</span>
+                    <Switch checked={source.is_enabled === 1} onCheckedChange={() => toggleEnabled(source)} />
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon-sm">
@@ -243,6 +276,10 @@ export function SourceManager() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => checkHealth(source)}>
+                          <RefreshCw className="mr-2 size-4" />
+                          重新检测
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => openEditDialog(source)}>
                           <Pencil className="mr-2 size-4" />
                           编辑
@@ -253,10 +290,7 @@ export function SourceManager() {
                             设为默认
                           </DropdownMenuItem>
                         )}
-                        <DropdownMenuItem
-                          onClick={() => openDeleteDialog(source)}
-                          className="text-destructive"
-                        >
+                        <DropdownMenuItem onClick={() => openDeleteDialog(source)} className="text-destructive">
                           <Trash2 className="mr-2 size-4" />
                           删除
                         </DropdownMenuItem>
@@ -269,7 +303,9 @@ export function SourceManager() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Globe className="size-4" />
-                    <span className="truncate" title={source.url}>{source.url}</span>
+                    <span className="truncate" title={source.url}>
+                      {source.url}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Clock className="size-4" />
@@ -278,7 +314,9 @@ export function SourceManager() {
                   {source.remark && (
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <MessageSquare className="size-4" />
-                      <span className="truncate" title={source.remark}>{source.remark}</span>
+                      <span className="truncate" title={source.remark}>
+                        {source.remark}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -306,39 +344,19 @@ export function SourceManager() {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="name">源名称 *</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="例如: bfzy"
-              />
+              <Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="例如: bfzy" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="url">API 地址 *</Label>
-              <Input
-                id="url"
-                value={formData.url}
-                onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                placeholder="例如: https://example.com/api.php/provide/vod/"
-              />
+              <Input id="url" value={formData.url} onChange={(e) => setFormData({ ...formData, url: e.target.value })} placeholder="例如: https://example.com/api.php/provide/vod/" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="timeout">超时时间 (ms)</Label>
-              <Input
-                id="timeout"
-                type="number"
-                value={formData.timeout}
-                onChange={(e) => setFormData({ ...formData, timeout: Number(e.target.value) })}
-              />
+              <Input id="timeout" type="number" value={formData.timeout} onChange={(e) => setFormData({ ...formData, timeout: Number(e.target.value) })} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="remark">备注</Label>
-              <Input
-                id="remark"
-                value={formData.remark}
-                onChange={(e) => setFormData({ ...formData, remark: e.target.value })}
-                placeholder="例如: 暴风资源"
-              />
+              <Input id="remark" value={formData.remark} onChange={(e) => setFormData({ ...formData, remark: e.target.value })} placeholder="例如: 暴风资源" />
             </div>
           </div>
           <DialogFooter>
@@ -375,4 +393,30 @@ export function SourceManager() {
       </Dialog>
     </>
   )
+}
+
+// 健康状态指示器组件
+function HealthIndicator({ status }: { status: HealthStatus }) {
+  switch (status) {
+    case "checking":
+      return (
+        <div className="flex items-center justify-center w-3 h-3" title="检测中">
+          <Loader2 className="size-3 animate-spin text-muted-foreground" />
+        </div>
+      )
+    case "healthy":
+      return (
+        <div className="flex items-center justify-center w-3 h-3" title="正常">
+          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+        </div>
+      )
+    case "unhealthy":
+      return (
+        <div className="flex items-center justify-center w-3 h-3" title="异常">
+          <div className="w-2 h-2 rounded-full bg-red-500" />
+        </div>
+      )
+    default:
+      return null
+  }
 }
