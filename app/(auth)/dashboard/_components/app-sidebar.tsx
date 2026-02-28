@@ -1,48 +1,11 @@
 "use client"
 
-import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Separator } from "@/components/ui/separator"
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarRail } from "@/components/ui/sidebar"
-import type { LucideIcon } from "lucide-react"
-import { LayoutDashboard, Settings, Mail, Github } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { Sidebar, SidebarRail } from "@/components/ui/sidebar"
 import { useSession } from "@/lib/auth-client"
-
-interface MenuItem {
-  title: string
-  url: string
-  icon: LucideIcon
-}
-
-interface MenuGroup {
-  title: string
-  children: MenuItem[]
-}
-
-const menuGroups: MenuGroup[] = [
-  {
-    title: "常用",
-    children: [
-      {
-        title: "概览",
-        url: "/dashboard",
-        icon: LayoutDashboard,
-      },
-    ],
-  },
-  {
-    title: "系统",
-    children: [
-      {
-        title: "设置",
-        url: "/dashboard/profile",
-        icon: Settings,
-      },
-    ],
-  },
-]
+import ASidebarHeader from "./sidebar-header"
+import ASidebarFooter from "./sidebar-footer"
+import ASidebarContent from "./sidebar-content"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
@@ -51,78 +14,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       {/* header */}
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <Link href="/">
-                <div className="bg-primary text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <LayoutDashboard className="size-4" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Dashboard</span>
-                </div>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-        <Separator className="bg-black/3" />
-      </SidebarHeader>
+      <ASidebarHeader />
 
       {/* content */}
-      <SidebarContent>
-        {menuGroups.map((group) => (
-          <SidebarGroup key={group.title}>
-            <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
-            <SidebarMenu>
-              {group.children.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton asChild isActive={pathname === item.url} tooltip={item.title}>
-                    <Link href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroup>
-        ))}
-      </SidebarContent>
+      <ASidebarContent pathname={pathname} />
 
       {/* footer */}
-      <SidebarFooter className="group-data-[collapsible=icon]:hidden">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <Separator className="bg-black/5" />
-            <div className="flex items-center text-gray-500 px-2 py-1">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span>{session?.user?.name || "Biscuit"}</span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <span>{session?.user?.email || "Biscuit"}</span>
-                </TooltipContent>
-              </Tooltip>
-              <div className="flex ml-auto">
-                <Button variant="ghost" size="icon-sm" asChild>
-                  <a href="mailto:duimiansima@outlook.com">
-                    <Mail />
-                  </a>
-                </Button>
-                <Button variant="ghost" size="icon-sm" asChild>
-                  <a href="https://github.com/landlordlycat/drama" target="_blank" rel="noopener noreferrer">
-                    <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <title>GitHub</title>
-                      <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
-                    </svg>
-                  </a>
-                </Button>
-              </div>
-            </div>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
+      <ASidebarFooter session={session} />
 
       {/* rail */}
       <SidebarRail />
