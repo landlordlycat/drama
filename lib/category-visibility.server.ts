@@ -52,12 +52,30 @@ export async function setManyTypesVisible(sourceName: string, typeIds: number[],
 }
 
 export function filterVisibleTypes(types: TypeItem[], hiddenIdSet: Set<number>): TypeItem[] {
-  return types
-    .filter((type) => !hiddenIdSet.has(type.id))
-    .map((type) => ({
-      ...type,
-      children: type.children?.filter((child) => !hiddenIdSet.has(child.id)),
-    }))
+  const result: TypeItem[] = []
+
+  for (const type of types) {
+    const visibleChildren = (type.children ?? []).filter((child) => !hiddenIdSet.has(child.id))
+    const isParentVisible = !hiddenIdSet.has(type.id)
+
+    if (isParentVisible) {
+      result.push({
+        ...type,
+        children: visibleChildren,
+      })
+      continue
+    }
+
+    // If parent is hidden but some children are visible, promote children to top-level.
+    for (const child of visibleChildren) {
+      result.push({
+        ...child,
+        children: [],
+      })
+    }
+  }
+
+  return result
 }
 
 export function flattenTypeIds(types: TypeItem[]): number[] {

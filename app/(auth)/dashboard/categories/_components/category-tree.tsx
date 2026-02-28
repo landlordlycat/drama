@@ -25,12 +25,12 @@ export default function CategoryTree({ types, sourceName, initialHiddenTypeIds }
     })
     return ids
   }, [types])
-  const [expandedIds, setExpandedIds] = useState<Set<number>>(() => new Set(parentIds))
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(() => new Set())
   const [hiddenIds, setHiddenIds] = useState<Set<number>>(new Set(initialHiddenTypeIds))
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    setExpandedIds(new Set(parentIds))
+    setExpandedIds(new Set())
   }, [parentIds])
 
   useEffect(() => {
