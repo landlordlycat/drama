@@ -1,17 +1,17 @@
 "use client"
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { ChevronDown, LogOutIcon, SquareKanban, UserCog } from "lucide-react"
 import { useState } from "react"
-import { authClient, useSession } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
+import { ChevronDown, LogOutIcon, SquareKanban, UserCog } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { authClient, useSession } from "@/lib/auth-client"
+import { writeAuthLog } from "@/lib/auth-log-client"
 
 export function UserDropdown() {
   const [open, setOpen] = useState(false)
   const { data: session } = useSession()
-
   const router = useRouter()
 
   return (
@@ -29,7 +29,7 @@ export function UserDropdown() {
       <DropdownMenuContent align="end">
         <DropdownMenuItem onSelect={() => router.push("/dashboard")}>
           <SquareKanban />
-          概述
+          概览
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => router.push("/dashboard/profile")}>
           <UserCog />
@@ -39,7 +39,13 @@ export function UserDropdown() {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           variant="destructive"
-          onSelect={() => {
+          onSelect={async () => {
+            await writeAuthLog({
+              operation: "LOGOUT",
+              content: "后台用户主动退出",
+              result: "SUCCESS",
+              fallbackUserName: session?.user.email,
+            })
             authClient.signOut()
             router.replace("/")
           }}

@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
-import type { SourcesResponse, SourceResponse, CreateSourceInput } from "@/lib/types/source"
+import type { CreateSourceInput, SourceResponse, SourcesResponse } from "@/lib/types/source"
 
 const API_BASE = process.env.API_BASE_URL || "https://api.bff.cc.cd"
 const API_KEY = process.env.API_ADMIN_KEY || ""
 
-// 获取所有源
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const res = await fetch(`${API_BASE}/sources`, {
       headers: API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {},
@@ -14,12 +13,11 @@ export async function GET(request: NextRequest) {
     const data: SourcesResponse = await res.json()
     return NextResponse.json(data)
   } catch (error) {
-    console.error("获取源列表失败:", error)
-    return NextResponse.json({ error: "获取源列表失败" }, { status: 500 })
+    console.error("获取播放源列表失败", error)
+    return NextResponse.json({ error: "获取播放源列表失败" }, { status: 500 })
   }
 }
 
-// 创建新源
 export async function POST(request: NextRequest) {
   const session = await auth.api.getSession({ headers: request.headers })
   if (!session) {
@@ -46,7 +44,7 @@ export async function POST(request: NextRequest) {
     const data: SourceResponse = await res.json()
     return NextResponse.json(data)
   } catch (error) {
-    console.error("创建源失败:", error)
-    return NextResponse.json({ error: "创建源失败" }, { status: 500 })
+    console.error("创建播放源失败", error)
+    return NextResponse.json({ error: "创建播放源失败" }, { status: 500 })
   }
 }
