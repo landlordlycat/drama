@@ -11,9 +11,9 @@ interface SearchResultsListProps {
 }
 
 export default async function SearchResultsList({ query, page = 1, defaultSource }: SearchResultsListProps) {
-  const res = await dramaApiService.search({ wd: query, page, limit: 24, source: defaultSource.name })
+  const res = await dramaApiService.search({ wd: query, page, limit: 20, source: defaultSource.name })
 
-  const details = await Promise.all(res.list.map((item) => dramaApiService.getDetail({ id: item.id })))
+  const details = await Promise.all(res.list.map((item) => dramaApiService.getDetail({ id: item.id, source: defaultSource.name })))
 
   if (details.length === 0) {
     return (

@@ -19,7 +19,8 @@ export default function DetailModal({ params }: { params: Promise<{ id: string }
 
 async function DetailContent({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const drama = await dramaApiService.getDetail({ id: Number(id) })
+  const defaultSource = await dramaApiService.getDefaultSource()
+  const drama = await dramaApiService.getDetail({ id: Number(id), source: defaultSource.name })
 
   return (
     <div className="flex flex-col w-full bg-background overflow-hidden h-[85vh]">
