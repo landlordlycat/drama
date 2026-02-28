@@ -3,10 +3,10 @@ import { auth } from "@/lib/auth"
 
 // 健康检测
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth.api.getSession({ headers: request.headers })
-  if (!session) {
-    return NextResponse.json({ error: "未授权" }, { status: 401 })
-  }
+  // const session = await auth.api.getSession({ headers: request.headers })
+  // if (!session) {
+  //   return NextResponse.json({ error: "未授权" }, { status: 401 })
+  // }
 
   try {
     const { searchParams } = new URL(request.url)

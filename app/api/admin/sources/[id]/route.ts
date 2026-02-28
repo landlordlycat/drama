@@ -7,11 +7,6 @@ const API_KEY = process.env.API_ADMIN_KEY || ""
 
 // 更新源
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth.api.getSession({ headers: request.headers })
-  if (!session) {
-    return NextResponse.json({ error: "未授权" }, { status: 401 })
-  }
-
   try {
     const { id } = await params
     const body: UpdateSourceInput = await request.json()
@@ -40,11 +35,6 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
 // 删除源
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth.api.getSession({ headers: request.headers })
-  if (!session) {
-    return NextResponse.json({ error: "未授权" }, { status: 401 })
-  }
-
   try {
     const { id } = await params
 

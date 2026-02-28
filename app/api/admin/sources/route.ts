@@ -7,11 +7,6 @@ const API_KEY = process.env.API_ADMIN_KEY || ""
 
 // 获取所有源
 export async function GET(request: NextRequest) {
-  const session = await auth.api.getSession({ headers: request.headers })
-  if (!session) {
-    return NextResponse.json({ error: "未授权" }, { status: 401 })
-  }
-
   try {
     const res = await fetch(`${API_BASE}/sources`, {
       headers: API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {},
