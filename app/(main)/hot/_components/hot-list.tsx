@@ -10,7 +10,7 @@ interface HotListProps {
 
 export default async function HotList({ page = 1, defaultSource }: HotListProps) {
   const res = await dramaApiService.getHot({ page, limit: 24, source: defaultSource?.name ?? "" })
-  const details = await Promise.all(res.map((item) => dramaApiService.getDetail({ id: item.id })))
+  const details = await Promise.all(res.map((item) => dramaApiService.getDetail({ id: item.id, source: defaultSource?.name })))
 
   if (!res.length) {
     return <div className="text-center text-gray-500">暂无数据</div>

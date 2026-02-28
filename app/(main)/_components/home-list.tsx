@@ -38,7 +38,8 @@ function DramaCardSkeleton() {
 }
 
 async function DramaCardWrapper({ id }: { id: number }) {
-  const detail = await dramaApiService.getDetail({ id })
+  const defaultSource = await dramaApiService.getDefaultSource()
+  const detail = await dramaApiService.getDetail({ id, source: defaultSource.name })
   if (!detail) return <DramaCardSkeleton />
   return <DramaCard item={detail} />
 }
