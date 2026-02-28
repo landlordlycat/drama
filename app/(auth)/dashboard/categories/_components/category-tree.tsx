@@ -59,7 +59,7 @@ export default function CategoryTree({ types, sourceName, initialHiddenTypeIds }
         return next
       })
     } catch (error) {
-      toast.error("Failed to update visibility")
+      toast.error("更新可见性失败")
     } finally {
       setSaving(false)
     }
@@ -83,7 +83,7 @@ export default function CategoryTree({ types, sourceName, initialHiddenTypeIds }
       if (!res.ok) throw new Error("request failed")
     } catch (error) {
       setHiddenIds(prev)
-      toast.error("Failed to update visibility")
+      toast.error("更新可见性失败")
     }
   }
 
@@ -105,25 +105,25 @@ export default function CategoryTree({ types, sourceName, initialHiddenTypeIds }
   return (
     <Card>
       <CardHeader className="space-y-3">
-        <CardTitle className="text-base">Category Visibility</CardTitle>
+        <CardTitle className="text-base">分类可见性管理</CardTitle>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={showAll} disabled={saving}>
-            Show All
+            全部显示
           </Button>
           <Button variant="outline" size="sm" onClick={hideAll} disabled={saving}>
-            Hide All
+            全部隐藏
           </Button>
           <Button variant="outline" size="sm" onClick={expandAll}>
-            Expand All
+            全部展开
           </Button>
           <Button variant="outline" size="sm" onClick={collapseAll}>
-            Collapse All
+            全部收起
           </Button>
         </div>
       </CardHeader>
       <CardContent>
         {types.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No category data</p>
+          <p className="text-sm text-muted-foreground">暂无分类数据</p>
         ) : (
           <ul className="space-y-5">
             {types.map((type) => {
@@ -136,7 +136,7 @@ export default function CategoryTree({ types, sourceName, initialHiddenTypeIds }
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
                       {hasChildren ? (
-                        <Button variant="ghost" size="icon-sm" onClick={() => toggleNode(type.id)} aria-label={isExpanded ? "Collapse node" : "Expand node"}>
+                        <Button variant="ghost" size="icon-sm" onClick={() => toggleNode(type.id)} aria-label={isExpanded ? "收起节点" : "展开节点"}>
                           {isExpanded ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />}
                         </Button>
                       ) : (
@@ -145,11 +145,11 @@ export default function CategoryTree({ types, sourceName, initialHiddenTypeIds }
                       <FolderTree className="size-4 text-muted-foreground" />
                       <span className="font-medium">{type.typeName}</span>
                       <Badge variant="secondary" className="text-xs">
-                        ID: {type.id}
+                        编号: {type.id}
                       </Badge>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">{hiddenIds.has(type.id) ? "hidden" : "visible"}</span>
+                      <span className="text-xs text-muted-foreground">{hiddenIds.has(type.id) ? "已隐藏" : "可见"}</span>
                       <Switch checked={!hiddenIds.has(type.id)} onCheckedChange={(checked) => updateOneVisible(type.id, checked)} disabled={saving} />
                     </div>
                   </div>
@@ -167,7 +167,7 @@ export default function CategoryTree({ types, sourceName, initialHiddenTypeIds }
                             </Badge>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs text-muted-foreground">{hiddenIds.has(child.id) ? "hidden" : "visible"}</span>
+                            <span className="text-xs text-muted-foreground">{hiddenIds.has(child.id) ? "已隐藏" : "可见"}</span>
                             <Switch checked={!hiddenIds.has(child.id)} onCheckedChange={(checked) => updateOneVisible(child.id, checked)} disabled={saving} />
                           </div>
                         </li>
