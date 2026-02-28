@@ -29,7 +29,7 @@ export default function Categories({ searchParams }: { searchParams: Promise<{ t
 async function CategoriesContent({ searchParams }: { searchParams: Promise<{ typeId?: string; page?: string }> }) {
   const { typeId, page } = await searchParams
   const defaultSource = await dramaApiService.getDefaultSource()
-  const typesRes = await dramaApiService.getTypes({ source: defaultSource })
+  const typesRes = await dramaApiService.getTypes({ source: defaultSource.name })
 
   return (
     <>
