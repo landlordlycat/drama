@@ -61,7 +61,6 @@ const menuGroups: MenuGroup[] = [
   },
 ]
 export default function ASidebarContent({ pathname }: { pathname: string }) {
-  console.log(pathname)
   return (
     <SidebarContent>
       {menuGroups.map((group) => (

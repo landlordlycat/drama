@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation"
 export function UserDropdown() {
   const [open, setOpen] = useState(false)
   const { data: session } = useSession()
+
   const router = useRouter()
 
   return (
