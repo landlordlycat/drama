@@ -1,6 +1,6 @@
 "use client"
 
-import { CategoryManager } from "./_components/category-manager"
+// import { CategoryManager } from "./_components/category-manager"
 
 export default function CategoriesManagePage() {
   return (
@@ -8,7 +8,7 @@ export default function CategoriesManagePage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">分类管理</h1>
       </div>
-      <CategoryManager />
+      {/* <CategoryManager /> */}
     </div>
   )
 }
