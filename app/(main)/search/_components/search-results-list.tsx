@@ -2,14 +2,16 @@ import { dramaApiService } from "@/lib/services/drama-api"
 import DramaCard from "@/app/(main)/_components/drama-card"
 import { Search } from "lucide-react"
 import { Pagination } from "@/components/pagination"
+import { Source } from "@/lib/types/source"
 
 interface SearchResultsListProps {
   query: string
   page?: number
+  defaultSource: Source
 }
 
-export default async function SearchResultsList({ query, page = 1 }: SearchResultsListProps) {
-  const res = await dramaApiService.search({ wd: query, page, limit: 24 })
+export default async function SearchResultsList({ query, page = 1, defaultSource }: SearchResultsListProps) {
+  const res = await dramaApiService.search({ wd: query, page, limit: 24, source: defaultSource.name })
 
   const details = await Promise.all(res.list.map((item) => dramaApiService.getDetail({ id: item.id })))
 

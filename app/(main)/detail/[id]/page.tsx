@@ -33,6 +33,7 @@ export default function DramaDetailPage({
 
 async function DramaContent({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const drama = await dramaApiService.getDetail({ id: Number(id) })
+  const defaultSource = await dramaApiService.getDefaultSource()
+  const drama = await dramaApiService.getDetail({ id: Number(id), source: defaultSource.name })
   return <VideoPlayerSection drama={drama} />
 }

@@ -1,14 +1,16 @@
 import { dramaApiService } from "@/lib/services/drama-api"
 import DramaCard from "@/app/(main)/_components/drama-card"
 import { Pagination } from "@/components/pagination"
+import { Source } from "@/lib/types/source"
 
 interface CategoryListProps {
   typeId?: number
   page?: number
+  defaultSource?: Source
 }
 
-export default async function CategoryList({ typeId, page = 1 }: CategoryListProps) {
-  const res = await dramaApiService.getList({ typeId, page, limit: 10 })
+export default async function CategoryList({ typeId, page = 1, defaultSource }: CategoryListProps) {
+  const res = await dramaApiService.getList({ typeId, page, limit: 10, source: defaultSource?.name ?? "" })
 
   const details = await Promise.all(res.list.map((item) => dramaApiService.getDetail({ id: item.id })))
 

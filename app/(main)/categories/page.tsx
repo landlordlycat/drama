@@ -28,7 +28,8 @@ export default function Categories({ searchParams }: { searchParams: Promise<{ t
 
 async function CategoriesContent({ searchParams }: { searchParams: Promise<{ typeId?: string; page?: string }> }) {
   const { typeId, page } = await searchParams
-  const typesRes = await dramaApiService.getTypes({})
+  const defaultSource = await dramaApiService.getDefaultSource()
+  const typesRes = await dramaApiService.getTypes({ source: defaultSource.name })
 
   return (
     <>
@@ -37,7 +38,7 @@ async function CategoriesContent({ searchParams }: { searchParams: Promise<{ typ
       </Suspense>
 
       <Suspense fallback={<CategorySkeleton />}>
-        <CategoryList typeId={typeId ? Number(typeId) : undefined} page={page ? Number(page) : 1} />
+        <CategoryList typeId={typeId ? Number(typeId) : undefined} page={page ? Number(page) : 1} defaultSource={defaultSource} />
       </Suspense>
     </>
   )

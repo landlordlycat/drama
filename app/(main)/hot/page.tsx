@@ -3,6 +3,7 @@ import { Suspense } from "react"
 import HotList from "./_components/hot-list"
 import { Skeleton } from "@/components/ui/skeleton"
 import type { Metadata } from "next"
+import { dramaApiService } from "@/lib/services/drama-api"
 
 export const metadata: Metadata = {
   title: "热门推荐",
@@ -31,8 +32,9 @@ export default function HotPage({ searchParams }: { searchParams: Promise<{ page
 async function HotContent({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
   const { page } = await searchParams
   const currentPage = page ? Number(page) : 1
+  const defaultSource = await dramaApiService.getDefaultSource()
 
-  return <HotList page={currentPage} />
+  return <HotList page={currentPage} defaultSource={defaultSource} />
 }
 
 function HotSkeleton() {

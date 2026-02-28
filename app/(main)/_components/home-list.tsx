@@ -3,10 +3,12 @@ import { dramaApiService } from "@/lib/services/drama-api"
 import { Pagination } from "@/components/pagination"
 import { AlertCircle, RefreshCw } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Source } from "@/lib/types/source"
 // import { SpinnerCustom } from "@/components/ui/spinner"
 
 interface HomeListProps {
   page?: number
+  defaultSource: Source
 }
 
 function ErrorDisplay({ message }: { message: string }) {
@@ -41,14 +43,13 @@ async function DramaCardWrapper({ id }: { id: number }) {
   return <DramaCard item={detail} />
 }
 
-export default async function HomeList({ page = 1 }: HomeListProps) {
+export default async function HomeList({ page = 1, defaultSource }: HomeListProps) {
   let list
   try {
     // 获取默认源
-    const defaultSource = await dramaApiService.getDefaultSource()
-    console.log(defaultSource)
-    const res = await dramaApiService.getList({ page, limit: 10, source: defaultSource })
-    console.log(res)
+    // const defaultSource = await dramaApiService.getDefaultSource()
+    const res = await dramaApiService.getList({ page, limit: 10, source: defaultSource.name })
+
     list = res
   } catch (error) {
     const message = error instanceof Error ? error.message : "发生未知错误，请稍后重试"

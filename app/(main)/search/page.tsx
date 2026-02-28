@@ -3,6 +3,7 @@ import { Suspense } from "react"
 import SearchResultsList from "./_components/search-results-list"
 import { Skeleton } from "@/components/ui/skeleton"
 import type { Metadata } from "next"
+import { dramaApiService } from "@/lib/services/drama-api"
 
 export const metadata: Metadata = {
   title: "搜索",
@@ -28,6 +29,7 @@ export default function SearchPage({ searchParams }: { searchParams: Promise<{ q
 async function SearchContent({ searchParams }: { searchParams: Promise<{ q?: string; page?: string }> }) {
   const { q = "", page } = await searchParams
   const currentPage = page ? Number(page) : 1
+  const defaultSource = await dramaApiService.getDefaultSource()
 
   return (
     <>
@@ -37,7 +39,7 @@ async function SearchContent({ searchParams }: { searchParams: Promise<{ q?: str
           关键词: <span className="text-foreground font-medium">{q}</span>
         </p>
       </div>
-      <SearchResultsList query={q} page={currentPage} />
+      <SearchResultsList query={q} page={currentPage} defaultSource={defaultSource} />
     </>
   )
 }
