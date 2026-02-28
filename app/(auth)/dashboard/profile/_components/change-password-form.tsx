@@ -55,7 +55,7 @@ export function ChangePasswordForm() {
       // 跳转到登录页
       router.replace("/sign-in")
     } catch (error) {
-      toast.error("密码修改失败，请稍后重试")
+      toast.error(  "密码修改失败，请稍后重试")
     } finally {
       setIsLoading(false)
     }
@@ -77,27 +77,11 @@ export function ChangePasswordForm() {
       </div>
       <div className="space-y-2">
         <Label htmlFor="new-password">新密码</Label>
-        <Input
-          id="new-password"
-          type="password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          placeholder="请输入新密码"
-          autoComplete="new-password"
-          required
-        />
+        <Input id="new-password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="请输入新密码" autoComplete="new-password" required />
       </div>
       <div className="space-y-2">
         <Label htmlFor="confirm-password">确认新密码</Label>
-        <Input
-          id="confirm-password"
-          type="password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          placeholder="请再次输入新密码"
-          autoComplete="new-password"
-          required
-        />
+        <Input id="confirm-password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="请再次输入新密码" autoComplete="new-password" required />
       </div>
       <Button type="submit" disabled={isLoading || !currentPassword || !newPassword || !confirmPassword}>
         {isLoading && <Loader2 className="mr-2 size-4 animate-spin" />}
