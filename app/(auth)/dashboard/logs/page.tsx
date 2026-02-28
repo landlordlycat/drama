@@ -1,8 +1,11 @@
 import Link from "next/link"
+import { headers } from "next/headers"
+import { redirect } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { auth } from "@/lib/auth"
 import { listOperationLogs } from "@/lib/operation-log.server"
 
 function formatTime(value: Date | string) {
@@ -36,6 +39,11 @@ export default async function LogsPage({
 }: {
   searchParams: Promise<{ q?: string; page?: string }>
 }) {
+  const session = await auth.api.getSession({ headers: await headers() })
+  if (!session) {
+    redirect("/sign-in")
+  }
+
   const { q = "", page = "1" } = await searchParams
   const currentPage = Math.max(Number(page) || 1, 1)
   const result = await listOperationLogs({
@@ -43,6 +51,8 @@ export default async function LogsPage({
     page: currentPage,
     pageSize: 20,
     operations: ["LOGIN", "LOGOUT", "CHANGE_PASSWORD"],
+    userId: session.user.id,
+    userName: session.user.email || session.user.name,
   })
 
   return (

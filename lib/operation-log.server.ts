@@ -1,4 +1,4 @@
-import { and, desc, ilike, or, sql } from "drizzle-orm"
+﻿import { and, count, desc, eq, ilike, inArray, isNull, or } from "drizzle-orm"
 import { db } from "@/db"
 import { operationLogs } from "@/db/schema/operation-log"
 
@@ -15,10 +15,12 @@ export interface ListOperationLogsInput {
   page?: number
   pageSize?: number
   operations?: string[]
+  userId?: string
+  userName?: string
 }
 
 export async function writeOperationLog(input: CreateOperationLogInput): Promise<void> {
-  const userName = input.userName?.trim() || "系统"
+  const userName = input.userName?.trim() || "system"
   await db.insert(operationLogs).values({
     userId: input.userId ?? null,
     userName,
@@ -34,6 +36,8 @@ export async function listOperationLogs(input: ListOperationLogsInput) {
   const offset = (page - 1) * pageSize
   const q = input.q?.trim()
   const operations = (input.operations ?? []).filter(Boolean)
+  const userId = input.userId?.trim()
+  const userName = input.userName?.trim()
 
   const keywordWhere = q
     ? or(
@@ -44,19 +48,18 @@ export async function listOperationLogs(input: ListOperationLogsInput) {
       )
     : undefined
 
-  const operationWhere =
-    operations.length > 0
-      ? or(...operations.map((op) => sql`${operationLogs.operation} = ${op}`))
-      : undefined
+  const operationWhere = operations.length > 0 ? inArray(operationLogs.operation, operations) : undefined
 
-  const where =
-    keywordWhere && operationWhere
-      ? and(keywordWhere, operationWhere)
-      : (keywordWhere ?? operationWhere)
+  const ownerWhere = userId
+    ? or(eq(operationLogs.userId, userId), and(isNull(operationLogs.userId), eq(operationLogs.userName, userName || "")))
+    : (userName ? eq(operationLogs.userName, userName) : undefined)
+
+  const whereClauses = [ownerWhere, keywordWhere, operationWhere].filter(Boolean)
+  const where = whereClauses.length === 0 ? undefined : whereClauses.length === 1 ? whereClauses[0] : and(...whereClauses)
 
   const [rows, countRows] = await Promise.all([
     db.select().from(operationLogs).where(where).orderBy(desc(operationLogs.createdAt)).limit(pageSize).offset(offset),
-    db.select({ count: sql<number>`count(*)` }).from(operationLogs).where(where),
+    db.select({ count: count() }).from(operationLogs).where(where),
   ])
 
   const total = Number(countRows[0]?.count ?? 0)
