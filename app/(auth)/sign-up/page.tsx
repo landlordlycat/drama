@@ -1,102 +1,106 @@
 "use client"
 
+import Image from "next/image"
+import { useState } from "react"
+import { Loader2, X } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { signUp } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useState } from "react"
-import Image from "next/image"
-import { Loader2, X } from "lucide-react"
-import { signUp } from "@/lib/auth-client"
-import { toast } from "sonner"
-import { useRouter } from "next/navigation"
+
+const PASSWORD_MIN_LENGTH = 6
+const PASSWORD_MAX_LENGTH = 12
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const PASSWORD_POLICY_REGEX = /^(?=.*[A-Za-z])(?=.*\d).+$/
 
 export default function SignUp() {
-  const [firstName, setFirstName] = useState("")
-  // const [lastName, setLastName] = useState("")
-
+  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [passwordConfirmation, setPasswordConfirmation] = useState("")
   const [image, setImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) {
-      setImage(file)
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string)
-      }
-      reader.readAsDataURL(file)
+    if (!file) return
+
+    setImage(file)
+    const reader = new FileReader()
+    reader.onloadend = () => setImagePreview(reader.result as string)
+    reader.readAsDataURL(file)
+  }
+
+  const handleSubmit = async () => {
+    const nextName = name.trim()
+    const nextEmail = email.trim().toLowerCase()
+
+    if (!nextName) {
+      toast.error("请输入昵称")
+      return
     }
+    if (!EMAIL_REGEX.test(nextEmail)) {
+      toast.error("邮箱格式不正确")
+      return
+    }
+    if (password.length < PASSWORD_MIN_LENGTH || password.length > PASSWORD_MAX_LENGTH) {
+      toast.error(`密码长度需在 ${PASSWORD_MIN_LENGTH}-${PASSWORD_MAX_LENGTH} 位之间`)
+      return
+    }
+    if (!PASSWORD_POLICY_REGEX.test(password)) {
+      toast.error("密码需包含字母和数字")
+      return
+    }
+    if (password !== passwordConfirmation) {
+      toast.error("两次输入密码不一致")
+      return
+    }
+
+    await signUp.email({
+      email: nextEmail,
+      password,
+      name: nextName,
+      image: image ? await convertImageToBase64(image) : "",
+      callbackURL: "/sign-in",
+      fetchOptions: {
+        onRequest: () => setLoading(true),
+        onResponse: () => setLoading(false),
+        onError: (ctx) => {
+          toast.error(ctx.error.message || "注册失败")
+        },
+        onSuccess: () => {
+          toast.success("注册成功，请先验证邮箱")
+          router.push("/sign-in")
+        },
+      },
+    })
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <Card className="z-50 rounded-md rounded-t-none max-w-md flex-1">
+    <div className="flex min-h-screen items-center justify-center">
+      <Card className="z-50 max-w-md flex-1 rounded-md rounded-t-none">
         <CardHeader>
           <CardTitle className="text-lg md:text-xl">注册</CardTitle>
-          <CardDescription className="text-xs md:text-sm"> 请输入您的个人信息 </CardDescription>
+          <CardDescription className="text-xs md:text-sm">创建你的账号</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4">
-            {/* <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="first-name">First name</Label>
-                <Input
-                  id="first-name"
-                  placeholder="Max"
-                  required
-                  onChange={(e) => {
-                    setFirstName(e.target.value)
-                  }}
-                  value={firstName}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="last-name">Last name</Label>
-                <Input
-                  id="last-name"
-                  placeholder="Robinson"
-                  required
-                  onChange={(e) => {
-                    setLastName(e.target.value)
-                  }}
-                  value={lastName}
-                />
-              </div>
-            </div> */}
             <div className="grid gap-2">
               <Label htmlFor="name">昵称</Label>
-              <Input
-                id="name"
-                placeholder="昵称"
-                onChange={(e) => {
-                  setFirstName(e.target.value)
-                }}
-                value={firstName}
-              />
+              <Input id="name" placeholder="请输入昵称" onChange={(e) => setName(e.target.value)} value={name} />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="email">邮箱</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-                onChange={(e) => {
-                  setEmail(e.target.value)
-                }}
-                value={email}
-              />
+              <Input id="email" type="email" placeholder="m@example.com" required onChange={(e) => setEmail(e.target.value)} value={email} />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">密码</Label>
-              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" placeholder="Password" />
+              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" placeholder="请输入密码" />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password_confirmation">确认密码</Label>
@@ -106,18 +110,18 @@ export default function SignUp() {
                 value={passwordConfirmation}
                 onChange={(e) => setPasswordConfirmation(e.target.value)}
                 autoComplete="new-password"
-                placeholder="Confirm Password"
+                placeholder="请再次输入密码"
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="image">头像 (可选)</Label>
+              <Label htmlFor="image">头像（可选）</Label>
               <div className="flex items-end gap-4">
                 {imagePreview && (
-                  <div className="relative w-16 h-16 rounded-sm overflow-hidden">
-                    <Image src={imagePreview} alt="Profile preview" layout="fill" objectFit="cover" />
+                  <div className="relative h-16 w-16 overflow-hidden rounded-sm">
+                    <Image src={imagePreview} alt="Profile preview" fill className="object-cover" />
                   </div>
                 )}
-                <div className="flex items-center gap-2 w-full">
+                <div className="flex w-full items-center gap-2">
                   <Input id="image" type="file" accept="image/*" onChange={handleImageChange} className="w-full" />
                   {imagePreview && (
                     <X
@@ -131,42 +135,15 @@ export default function SignUp() {
                 </div>
               </div>
             </div>
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={loading}
-              onClick={async () => {
-                await signUp.email({
-                  email,
-                  password,
-                  // name: `${firstName} ${lastName}`,
-                  name: firstName,
-                  image: image ? await convertImageToBase64(image) : "",
-                  callbackURL: "/dashboard",
-                  fetchOptions: {
-                    onResponse: () => {
-                      setLoading(false)
-                    },
-                    onRequest: () => {
-                      setLoading(true)
-                    },
-                    onError: (ctx) => {
-                      toast.error(ctx.error.message)
-                    },
-                    onSuccess: () => {
-                      router.push("/dashboard")
-                    },
-                  },
-                })
-              }}
-            >
+            <Button type="submit" className="w-full" disabled={loading} onClick={handleSubmit}>
               {loading ?
                 <Loader2 size={16} className="animate-spin" />
               : "注册"}
             </Button>
           </div>
-          <span className="text-sm mt-3 block text-muted-foreground cursor-pointer" onClick={() => router.push("/sign-in")}>
-            已有账号？ 登录
+
+          <span className="mt-3 block cursor-pointer text-sm text-muted-foreground" onClick={() => router.push("/sign-in")}>
+            已有账号？去登录
           </span>
         </CardContent>
       </Card>

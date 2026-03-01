@@ -3,15 +3,15 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Loader2 } from "lucide-react"
+import { toast } from "sonner"
+import { signIn } from "@/lib/auth-client"
+import { writeAuthLog } from "@/lib/auth-log-client"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { signIn } from "@/lib/auth-client"
-import { writeAuthLog } from "@/lib/auth-log-client"
-import { cn } from "@/lib/utils"
-import { toast } from "sonner"
 
 export default function SignIn() {
   const [email, setEmail] = useState("")
@@ -20,11 +20,11 @@ export default function SignIn() {
   const [rememberMe, setRememberMe] = useState(false)
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex min-h-screen items-center justify-center">
       <Card className="max-w-md flex-1">
         <CardHeader>
           <CardTitle className="text-lg md:text-xl">登录</CardTitle>
-          <CardDescription className="text-xs md:text-sm">输入账号密码登录</CardDescription>
+          <CardDescription className="text-xs md:text-sm">请输入邮箱和密码登录</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4">
@@ -37,7 +37,7 @@ export default function SignIn() {
               <div className="flex items-center">
                 <Label htmlFor="password">密码</Label>
                 <Link href="#" className="ml-auto inline-block text-sm underline">
-                  忘记密码?
+                  忘记密码？
                 </Link>
               </div>
               <Input id="password" type="password" placeholder="password" autoComplete="password" value={password} onChange={(e) => setPassword(e.target.value)} />
@@ -60,7 +60,7 @@ export default function SignIn() {
               disabled={loading}
               onClick={async () => {
                 await signIn.email({
-                  email,
+                  email: email.trim().toLowerCase(),
                   password,
                   rememberMe,
                   callbackURL: "/",
@@ -76,11 +76,15 @@ export default function SignIn() {
                         fallbackUserName: email,
                       })
                     },
-                    onError: () => {
-                      toast.error("账号或密码错误")
+                    onError: (ctx) => {
+                      const message = String(ctx.error?.message || "")
+                      const code = String(ctx.error?.code || "")
+                      const isUnverified = /verify|verified|email/i.test(message) || /verify|verified|email/i.test(code)
+
+                      toast.error(isUnverified ? "请先验证邮箱后再登录" : "账号或密码错误")
                       writeAuthLog({
                         operation: "LOGIN",
-                        content: "邮箱密码登录失败",
+                        content: isUnverified ? "邮箱未验证，登录失败" : "邮箱密码登录失败",
                         result: "FAILURE",
                         fallbackUserName: email,
                       })
@@ -92,7 +96,7 @@ export default function SignIn() {
               {loading ? <Loader2 size={16} className="animate-spin" /> : <p>登录</p>}
             </Button>
 
-            <div className={cn("w-full gap-2 flex items-center", "justify-between flex-col")}>
+            <div className={cn("flex w-full items-center gap-2", "justify-between flex-col")}>
               <Button
                 variant="outline"
                 className="w-full gap-2"
