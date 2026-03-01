@@ -15,6 +15,13 @@
       "when": 1772281431369,
       "tag": "0001_spooky_veda",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1772352000000,
+      "tag": "0002_favorites",
+      "breakpoints": true
     }
   ]
 }
