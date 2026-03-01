@@ -1,11 +1,9 @@
-import React from "react"
+import DashboardOverview from "./_components/dashboard-overview"
 
-export default function page() {
+export default function DashboardPage() {
   return (
-    <div className="flex-1">
-      <header>
-        <span>晚上好,</span>
-      </header>
+    <div className="flex flex-1 flex-col gap-4 p-4">
+      <DashboardOverview />
     </div>
   )
 }
