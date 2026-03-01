@@ -218,7 +218,7 @@ export function SourceManager() {
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="mx-auto w-full max-w-4xl space-y-4">
         {/* 头部 */}
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
@@ -237,7 +237,7 @@ export function SourceManager() {
         </div>
 
         {/* 源列表 */}
-        <div className="grid gap-4">
+        <div className="grid gap-3">
           {sources.map((source) => (
             <Card key={source.id} className={source.is_enabled === 0 ? "opacity-60" : ""}>
               <CardHeader className="py-4">
@@ -292,7 +292,7 @@ export function SourceManager() {
                 </div>
               </CardHeader>
               <CardContent className="pt-0 pb-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div className="grid grid-cols-1 gap-3 text-sm md:grid-cols-2">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Globe className="size-4" />
                     <span className="truncate" title={source.url}>
