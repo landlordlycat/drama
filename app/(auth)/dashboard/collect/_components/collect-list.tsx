@@ -79,9 +79,9 @@ export default function CollectList() {
     }
 
     return (
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4">
         {rows.map((item) => (
-          <Card key={item.id} className="overflow-hidden py-0">
+          <Card key={item.id} className="mx-auto w-full max-w-72 overflow-hidden py-0">
             <CardContent className="p-0">
               <div className="relative aspect-[16/9] w-full">
                 <Image src={item.cover || "/logo.svg"} alt={item.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
