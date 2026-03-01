@@ -1,129 +1,107 @@
-# Drama - 影视在线播放平台
+﻿# Drama
 
-一个基于 Next.js 构建的现代化影视在线播放平台，支持视频搜索、分类浏览、热门推荐等功能。
+基于 Next.js 16 + TypeScript 的影视播放与后台管理项目。
 
-## ✨ 功能特性
+## 功能概览
 
-- 🎬 **视频播放** - 支持剧集在线播放，使用 ArtPlayer 播放器
-- 🔍 **搜索功能** - 支持关键词搜索影视资源
-- 📂 **分类浏览** - 按类型分类浏览影视内容
-- 🔥 **热门推荐** - 展示热门影视资源
-- 🌙 **主题切换** - 支持明暗主题切换
-- 📱 **响应式设计** - 适配各种设备屏幕
+- 前台：首页、分类、搜索、热门、详情、播放器
+- 用户：邮箱注册/登录、GitHub 登录、忘记密码、重置密码
+- 用户中心：资料编辑、修改密码、修改邮箱（邮件验证后生效）
+- 内容能力：收藏夹、观看历史、历史上报、来源切换
+- 后台：概览、日志、分类、标签、播放源、收藏管理、历史管理
 
-## 🛠️ 技术栈
+## 技术栈
 
-- **框架**: Next.js 16 (App Router)
-- **语言**: TypeScript
-- **UI 组件**: Radix UI + shadcn/ui
-- **样式**: Tailwind CSS v4
-- **播放器**: ArtPlayer
-- **主题**: next-themes
-- **日期处理**: date-fns
+- Next.js 16（App Router）
+- TypeScript
+- Tailwind CSS v4
+- Radix UI + shadcn/ui
+- Better Auth
+- Drizzle ORM + Neon/PostgreSQL
+- Resend（认证邮件发送）
 
-## 📁 项目结构
+## 目录结构
 
-```
-drama/
-├── app/                    # Next.js App Router
-│   ├── (home)/            # 首页模块
-│   ├── @modal/            # 模态框 (并行路由)
-│   ├── api/               # API 路由
-│   ├── categories/        # 分类页面
-│   ├── detail/            # 详情页面
-│   ├── hot/               # 热门页面
-│   ├── search/            # 搜索页面
-│   └── user/              # 用户模块
-├── components/            # 公共组件
-│   ├── ui/               # UI 基础组件
-│   ├── drama/            # 影视相关组件
-│   ├── layout/           # 布局组件
-│   └── player/           # 播放器组件
-├── config/               # 配置文件
-├── constants/            # 常量定义
-├── lib/                  # 工具库
-│   ├── services/        # API 服务
-│   └── types/           # 类型定义
-└── styles/              # 全局样式
+```txt
+app/                  路由与页面（含 API）
+components/           通用组件与 UI 组件
+lib/                  业务逻辑、服务、工具、认证
+db/                   数据库连接
+auth-schema.ts        认证相关表结构
+drizzle/              数据库迁移
+public/               静态资源
+styles/               全局样式
 ```
 
-## 🚀 快速开始
-
-### 环境要求
-
-- Node.js 18+
-- pnpm (推荐)
-
-### 安装依赖
+## 本地开发
 
 ```bash
 pnpm install
-```
-
-### 配置环境变量
-
-创建 `.env.local` 文件并配置 API 地址：
-
-```env
-ZY_BASE_URL=your_api_base_url
-```
-
-### 启动开发服务器
-
-```bash
 pnpm dev
 ```
 
-访问 [http://localhost:3000](http://localhost:3000) 查看应用。
-
-### 构建生产版本
+构建与运行：
 
 ```bash
 pnpm build
 pnpm start
 ```
 
-## 📡 API 接口
+质量检查：
 
-项目通过 `ApiService` 类封装了以下接口：
+```bash
+pnpm lint
+pnpm exec tsc --noEmit
+```
 
-| 接口          | 方法          | 描述         |
-| ------------- | ------------- | ------------ |
-| `/list`       | `getList()`   | 获取影视列表 |
-| `/search`     | `search()`    | 搜索影视     |
-| `/detail/:id` | `getDetail()` | 获取影视详情 |
-| `/hot`        | `getHot()`    | 获取热门影视 |
-| `/types`      | `getTypes()`  | 获取分类列表 |
+## 环境变量
 
-## 📊 开发进度
+请参考 `.env.example`，至少配置以下项目：
 
-### ✅ 已完成功能
+- `DATABASE_URL`
+- `BETTER_AUTH_SECRET`
+- `BETTER_AUTH_URL`
+- `NEXT_PUBLIC_APP_URL`
+- `RESEND_API_KEY`
+- `MAIL_FROM`
+- `GITHUB_CLIENT_ID`
+- `GITHUB_CLIENT_SECRET`
 
-| 功能          | 说明                                                 |
-| ------------- | ---------------------------------------------------- |
-| 首页列表      | 分页展示影视列表                                     |
-| 视频搜索      | 关键词搜索，支持分页                                 |
-| 分类浏览      | 按类型筛选，支持分页                                 |
-| 热门推荐      | 展示热门影视资源                                     |
-| 视频详情      | 展示影视信息、演员、导演等                           |
-| 视频播放      | ArtPlayer 播放器，支持上下集切换、自动连播、倍速播放 |
-| 选集功能      | 剧集选择列表                                         |
-| 主题切换      | 明暗主题切换                                         |
-| 全局搜索      | Header 搜索框                                        |
-| Loading 状态  | Suspense + Skeleton 骨架屏                           |
-| 模态框路由    | @modal 并行路由 (拦截详情路由)                       |
-| 移动端导航    | 适配移动设备的导航菜单                               |
-| 用户登录/注册 | 用户认证系统                                         |
-| 用户中心      | 个人信息管理                                         |
-| 收藏功能      | 收藏喜欢的影视                                       |
+## 认证与注册策略
 
-### 🚧 待开发功能
+### 1) GitHub 登录行为
 
-| 功能     | 说明             |
-| -------- | ---------------- |
-| 观看历史 | 记录用户观看历史 |
-| 评分展示 | 展示豆瓣评分     |
+- 首次 GitHub 登录：会创建账号（相当于注册）并完成可用身份建立。
+- 再次 GitHub 登录：直接登录已有账号。
 
-## 📄 License
+### 2) 关闭公开注册（当前实现）
+
+目前支持通过环境变量控制：
+
+- `AUTH_ALLOW_SIGN_UP=false`
+- `NEXT_PUBLIC_AUTH_ALLOW_SIGN_UP=false`
+
+生效效果：
+
+- 后端拒绝邮箱注册接口（`/api/auth/sign-up/email`）
+- 登录页隐藏“去注册”入口
+- 注册页显示“注册已关闭”提示
+- GitHub 登录禁止隐式注册（仅允许已存在用户登录）
+
+修改后需重启服务。
+
+### 3) 修改邮箱
+
+后台设置页已支持“修改邮箱”：
+
+- 输入新邮箱后发送验证邮件
+- 用户点击邮件验证链接后，邮箱才会真正变更
+
+## 后续计划（认证）
+
+- 增加“后台可视化开关注册”能力（管理员在设置页直接开关）
+- 使用数据库系统配置项替代环境变量，做到实时生效（无需改 env）
+
+## License
 
 MIT
