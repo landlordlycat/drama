@@ -88,7 +88,7 @@ export default function CollectList() {
               </div>
 
               <div className="space-y-3 p-4">
-                <h3 className="line-clamp-2 text-base font-semibold">{item.title}</h3>
+                <h3 className="line-clamp-1  text-base font-semibold">{item.title}</h3>
                 <div className="space-y-1 text-xs text-muted-foreground">
                   <p>集数: {item.total || "-"}</p>
                   <p>年份: {item.year || "-"}</p>
