@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import Image from "next/image"
 import { useState } from "react"
@@ -53,11 +53,11 @@ export default function SignUp() {
       return
     }
     if (!PASSWORD_POLICY_REGEX.test(password)) {
-      toast.error("密码需包含字母和数字")
+      toast.error("密码需要同时包含字母和数字")
       return
     }
     if (password !== passwordConfirmation) {
-      toast.error("两次输入密码不一致")
+      toast.error("两次输入的密码不一致")
       return
     }
 
@@ -101,6 +101,7 @@ export default function SignUp() {
             <div className="grid gap-2">
               <Label htmlFor="password">密码</Label>
               <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" placeholder="请输入密码" />
+              <p className="text-xs text-muted-foreground">长度 6-12 位，且必须包含字母和数字。</p>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password_confirmation">确认密码</Label>
@@ -118,7 +119,7 @@ export default function SignUp() {
               <div className="flex items-end gap-4">
                 {imagePreview && (
                   <div className="relative h-16 w-16 overflow-hidden rounded-sm">
-                    <Image src={imagePreview} alt="Profile preview" fill className="object-cover" />
+                    <Image src={imagePreview} alt="头像预览" fill className="object-cover" />
                   </div>
                 )}
                 <div className="flex w-full items-center gap-2">
@@ -136,9 +137,7 @@ export default function SignUp() {
               </div>
             </div>
             <Button type="submit" className="w-full" disabled={loading} onClick={handleSubmit}>
-              {loading ?
-                <Loader2 size={16} className="animate-spin" />
-              : "注册"}
+              {loading ? <Loader2 size={16} className="animate-spin" /> : "注册"}
             </Button>
           </div>
 
