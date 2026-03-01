@@ -23,6 +23,11 @@ interface ListWatchHistoryInput {
   limit?: number
 }
 
+export interface WatchTrendPoint {
+  date: string
+  count: number
+}
+
 function normalizeText(value?: string | null): string | null {
   const next = value?.trim()
   return next ? next : null
@@ -98,4 +103,35 @@ export async function deleteWatchHistoryItem(userId: string, dramaId: number, so
 
 export async function clearWatchHistory(userId: string): Promise<void> {
   await db.delete(watchHistory).where(eq(watchHistory.userId, userId))
+}
+
+export async function getWatchHistoryTrend(userId: string, days = 7): Promise<WatchTrendPoint[]> {
+  const safeDays = Math.min(Math.max(Math.floor(days), 1), 30)
+  const rows = (await db.execute(sql`
+    SELECT TO_CHAR((updated_at AT TIME ZONE 'UTC')::date, 'YYYY-MM-DD') AS date,
+           COUNT(*)::int AS count
+    FROM watch_history
+    WHERE user_id = ${userId}
+      AND updated_at >= NOW() - (${safeDays - 1} * INTERVAL '1 day')
+    GROUP BY 1
+    ORDER BY 1 ASC
+  `)) as unknown as { rows: Array<{ date: string; count: number | string }> }
+
+  const countByDate = new Map<string, number>()
+  for (const row of rows.rows ?? []) {
+    countByDate.set(row.date, Number(row.count) || 0)
+  }
+
+  const result: WatchTrendPoint[] = []
+  for (let i = safeDays - 1; i >= 0; i -= 1) {
+    const d = new Date()
+    d.setUTCDate(d.getUTCDate() - i)
+    const date = d.toISOString().slice(0, 10)
+    result.push({
+      date,
+      count: countByDate.get(date) || 0,
+    })
+  }
+
+  return result
 }

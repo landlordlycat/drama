@@ -2,10 +2,12 @@
 
 import Link from "next/link"
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { Clock3, Heart, History, Loader2, MonitorPlay, RefreshCw } from "lucide-react"
+import { Clock3, Heart, History, Loader2, MonitorPlay, RefreshCw, TrendingUp } from "lucide-react"
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import { useSession } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart"
 import { formatDate } from "@/lib/formatDate"
 
 interface SourceInfo {
@@ -17,7 +19,6 @@ interface SourceInfo {
 interface FavoriteItem {
   id: number
   title: string
-  createdAt?: string
 }
 
 interface HistoryItem {
@@ -28,11 +29,54 @@ interface HistoryItem {
   lastEpisodeName: string | null
 }
 
+interface TrendPoint {
+  date: string
+  count: number
+  day: string
+}
+
 function getGreeting(hour: number) {
   if (hour < 11) return "早上好"
   if (hour < 14) return "中午好"
   if (hour < 18) return "下午好"
   return "晚上好"
+}
+
+function buildEmptyTrend(days = 7): TrendPoint[] {
+  const result: TrendPoint[] = []
+  for (let i = days - 1; i >= 0; i -= 1) {
+    const d = new Date()
+    d.setUTCDate(d.getUTCDate() - i)
+    const date = d.toISOString().slice(0, 10)
+    result.push({ date, count: 0, day: date.slice(5) })
+  }
+  return result
+}
+
+function WeekTrendChart({ data }: { data: TrendPoint[] }) {
+  const total = data.reduce((sum, item) => sum + item.count, 0)
+  const chartData = data.map((item) => ({ ...item, day: item.day || item.date.slice(5) }))
+  const chartConfig = {
+    count: {
+      label: "观看次数",
+      color: "var(--color-chart-1)",
+    },
+  } satisfies ChartConfig
+
+  return (
+    <div className="space-y-3">
+      <ChartContainer config={chartConfig} className="h-40 w-full">
+        <BarChart accessibilityLayer data={chartData} margin={{ left: -12, right: 8, top: 8 }}>
+          <CartesianGrid vertical={false} />
+          <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={8} />
+          <YAxis allowDecimals={false} tickLine={false} axisLine={false} width={28} />
+          <ChartTooltip content={<ChartTooltipContent formatter={(value) => `${value} 次`} />} />
+          <Bar dataKey="count" fill="var(--color-count)" radius={[4, 4, 0, 0]} />
+        </BarChart>
+      </ChartContainer>
+      <p className="text-xs text-muted-foreground">近 7 天累计观看更新 {total} 次</p>
+    </div>
+  )
 }
 
 export default function DashboardOverview() {
@@ -41,24 +85,28 @@ export default function DashboardOverview() {
   const [source, setSource] = useState<SourceInfo | null>(null)
   const [favorites, setFavorites] = useState<FavoriteItem[]>([])
   const [history, setHistory] = useState<HistoryItem[]>([])
+  const [trend, setTrend] = useState<TrendPoint[]>([])
 
   const loadOverview = useCallback(async () => {
     setLoading(true)
     try {
-      const [sourceRes, favoritesRes, historyRes] = await Promise.all([
+      const [sourceRes, favoritesRes, historyRes, trendRes] = await Promise.all([
         fetch("/api/admin/sources/default"),
         fetch("/api/favorites"),
         fetch("/api/history?page=1&limit=8"),
+        fetch("/api/history/trend?days=7"),
       ])
 
       const sourcePayload = sourceRes.ok ? await sourceRes.json() : null
       const favoritesPayload = favoritesRes.ok ? await favoritesRes.json() : null
       const historyPayload = historyRes.ok ? await historyRes.json() : null
+      const trendPayload = trendRes.ok ? await trendRes.json() : null
 
       const sourceData = sourcePayload?.data || sourcePayload
       setSource(sourceData?.name ? { name: sourceData.name, url: sourceData.url, id: sourceData.id } : null)
       setFavorites(Array.isArray(favoritesPayload?.data) ? favoritesPayload.data : [])
       setHistory(Array.isArray(historyPayload?.data?.rows) ? historyPayload.data.rows : [])
+      setTrend(Array.isArray(trendPayload?.data) ? trendPayload.data.map((item: TrendPoint) => ({ ...item, day: item.date.slice(5) })) : [])
     } finally {
       setLoading(false)
     }
@@ -164,12 +212,13 @@ export default function DashboardOverview() {
 
       <Card className="py-4">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">建议优化</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <TrendingUp className="size-4 text-primary" />
+            近 7 天观看次数趋势
+          </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2 text-sm text-muted-foreground">
-          <p>1. 将收藏夹和历史记录的统计接口改为只返回 count，减少首页加载体积。</p>
-          <p>2. 增加“近 7 天观看次数”趋势图，概览信息更有价值。</p>
-          <p>3. 在概览页增加“最近观看继续播放”直达按钮，提升操作效率。</p>
+        <CardContent>
+          <WeekTrendChart data={trend.length > 0 ? trend : buildEmptyTrend(7)} />
         </CardContent>
       </Card>
     </div>
