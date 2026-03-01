@@ -22,6 +22,13 @@
       "when": 1772352000000,
       "tag": "0002_favorites",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1772355600000,
+      "tag": "0003_watch_history",
+      "breakpoints": true
     }
   ]
 }

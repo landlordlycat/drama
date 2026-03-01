@@ -14,7 +14,7 @@ export async function generateMetadata({
   searchParams,
 }: {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ source?: string }>
+  searchParams: Promise<{ source?: string; ep?: string }>
 }): Promise<Metadata> {
   try {
     const { id } = await params
@@ -37,7 +37,7 @@ export default function DramaDetailPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ source?: string }>
+  searchParams: Promise<{ source?: string; ep?: string }>
 }) {
   return (
     <div className="min-h-screen bg-background">
@@ -59,13 +59,14 @@ async function DramaContent({
   searchParams,
 }: {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ source?: string }>
+  searchParams: Promise<{ source?: string; ep?: string }>
 }) {
   const { id } = await params
-  const { source } = await searchParams
+  const { source, ep } = await searchParams
   const defaultSource = await dramaApiService.getDefaultSource()
   const sourceName = source?.trim() || defaultSource.name
+  const initialEpisodeIndex = Number.isInteger(Number(ep)) ? Math.max(Number(ep), 0) : 0
   const drama = await dramaApiService.getDetail({ id: Number(id), source: sourceName })
 
-  return <VideoPlayerSection drama={drama} sourceName={sourceName} />
+  return <VideoPlayerSection drama={drama} sourceName={sourceName} initialEpisodeIndex={initialEpisodeIndex} />
 }

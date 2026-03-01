@@ -1,39 +1,36 @@
 "use client"
 
-import { useState, useCallback } from "react"
-import { DramaDetail, Episode } from "@/lib/types/api"
+import { useCallback, useEffect, useRef, useState } from "react"
+import type Artplayer from "artplayer"
 import { Calendar, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { formatDate } from "@/lib/formatDate"
 import ArtPlayer from "@/components/player/art-player"
+import { formatDate } from "@/lib/formatDate"
+import type { DramaDetail, Episode } from "@/lib/types/api"
 import FavoriteToggle from "./favorite-toggle"
 
 interface VideoPlayerSectionProps {
   drama: DramaDetail
   sourceName: string
+  initialEpisodeIndex?: number
 }
 
-export default function VideoPlayerSection({ drama, sourceName }: VideoPlayerSectionProps) {
-  const [currentEpisodeIndex, setCurrentEpisodeIndex] = useState(0)
+export default function VideoPlayerSection({ drama, sourceName, initialEpisodeIndex = 0 }: VideoPlayerSectionProps) {
+  const [currentEpisodeIndex, setCurrentEpisodeIndex] = useState(() => {
+    const max = Math.max(drama.episodes.length - 1, 0)
+    return Math.min(Math.max(initialEpisodeIndex, 0), max)
+  })
 
+  const artRef = useRef<Artplayer | null>(null)
+  const lastSyncTsRef = useRef(0)
   const currentEpisode = drama.episodes[currentEpisodeIndex]
 
   const handleNextEpisode = useCallback(() => {
-    setCurrentEpisodeIndex((prev) => {
-      if (prev < drama.episodes.length - 1) {
-        return prev + 1
-      }
-      return prev
-    })
+    setCurrentEpisodeIndex((prev) => (prev < drama.episodes.length - 1 ? prev + 1 : prev))
   }, [drama.episodes.length])
 
   const handlePrevEpisode = useCallback(() => {
-    setCurrentEpisodeIndex((prev) => {
-      if (prev > 0) {
-        return prev - 1
-      }
-      return prev
-    })
+    setCurrentEpisodeIndex((prev) => (prev > 0 ? prev - 1 : prev))
   }, [])
 
   const handleSelectEpisode = useCallback((index: number) => {
@@ -49,6 +46,83 @@ export default function VideoPlayerSection({ drama, sourceName }: VideoPlayerSec
     year: drama.year,
     time: drama.time,
   }
+
+  const syncHistory = useCallback(
+    async (force = false) => {
+      const now = Date.now()
+      if (!force && now - lastSyncTsRef.current < 15000) return
+
+      const art = artRef.current
+      const lastPositionSec = art ? Math.max(Math.floor(art.currentTime), 0) : 0
+      const duration = art ? Math.floor(art.duration) : 0
+      lastSyncTsRef.current = now
+
+      try {
+        await fetch("/api/history", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            dramaId: drama.id,
+            sourceName,
+            title: drama.title,
+            cover: drama.cover,
+            total: drama.total,
+            year: drama.year,
+            time: drama.time,
+            lastEpisodeIndex: currentEpisodeIndex,
+            lastEpisodeName: currentEpisode?.name || "",
+            lastPositionSec,
+            durationSec: Number.isFinite(duration) ? duration : 0,
+          }),
+        })
+      } catch {
+        // Ignore reporting failures.
+      }
+    },
+    [currentEpisode, currentEpisodeIndex, drama.cover, drama.id, drama.time, drama.title, drama.total, drama.year, sourceName],
+  )
+
+  const playerInstanceHandler = useCallback((art: Artplayer) => {
+    artRef.current = art
+  }, [])
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      void syncHistory(false)
+    }, 15000)
+
+    return () => {
+      window.clearInterval(timer)
+      void syncHistory(true)
+    }
+  }, [syncHistory])
+
+  useEffect(() => {
+    void syncHistory(true)
+  }, [currentEpisodeIndex, syncHistory])
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      const art = artRef.current
+      const payload = JSON.stringify({
+        dramaId: drama.id,
+        sourceName,
+        title: drama.title,
+        cover: drama.cover,
+        total: drama.total,
+        year: drama.year,
+        time: drama.time,
+        lastEpisodeIndex: currentEpisodeIndex,
+        lastEpisodeName: currentEpisode?.name || "",
+        lastPositionSec: art ? Math.max(Math.floor(art.currentTime), 0) : 0,
+        durationSec: art ? Math.max(Math.floor(art.duration), 0) : 0,
+      })
+      navigator.sendBeacon("/api/history", payload)
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload)
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload)
+  }, [currentEpisode, currentEpisodeIndex, drama.cover, drama.id, drama.time, drama.title, drama.total, drama.year, sourceName])
 
   return (
     <div className="flex flex-col space-y-6">
@@ -72,7 +146,9 @@ export default function VideoPlayerSection({ drama, sourceName }: VideoPlayerSec
             onNextEpisode={handleNextEpisode}
             hasPrev={currentEpisodeIndex > 0}
             hasNext={currentEpisodeIndex < drama.episodes.length - 1}
+            getInstance={playerInstanceHandler}
           />
+
           <div className="hidden md:flex md:justify-end">
             <FavoriteToggle sourceName={sourceName} drama={favoriteDrama} />
           </div>
