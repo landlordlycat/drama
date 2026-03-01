@@ -4,6 +4,7 @@ import { nextCookies } from "better-auth/next-js"
 import { Resend } from "resend"
 import { db } from "@/db"
 import * as schema from "@/auth-schema"
+import { authAllowSignUp } from "@/lib/auth-config"
 
 const PASSWORD_MIN_LENGTH = 6
 const PASSWORD_MAX_LENGTH = 12
@@ -121,6 +122,7 @@ export const auth = betterAuth({
     github: {
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+      disableSignUp: !authAllowSignUp,
     },
   },
 

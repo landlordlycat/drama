@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import Link from "next/link"
@@ -12,6 +12,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+
+const ALLOW_SIGN_UP = process.env.NEXT_PUBLIC_AUTH_ALLOW_SIGN_UP !== "false"
 
 export default function SignIn() {
   const [email, setEmail] = useState("")
@@ -82,11 +84,13 @@ export default function SignIn() {
               <Checkbox id="remember" checked={rememberMe} onCheckedChange={(checked) => setRememberMe(checked === true)} />
               <Label htmlFor="remember">记住我</Label>
 
-              <Link href="/sign-up" className="ml-auto">
-                <Button variant="link" className="text-xs">
-                  没有账号？去注册
-                </Button>
-              </Link>
+              {ALLOW_SIGN_UP && (
+                <Link href="/sign-up" className="ml-auto">
+                  <Button variant="link" className="text-xs">
+                    没有账号？去注册
+                  </Button>
+                </Link>
+              )}
             </div>
 
             <Button type="submit" className="w-full" disabled={loading} onClick={handleSignIn}>

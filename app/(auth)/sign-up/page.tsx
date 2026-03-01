@@ -1,6 +1,7 @@
 ﻿"use client"
 
 import Image from "next/image"
+import Link from "next/link"
 import { useState } from "react"
 import { Loader2, X } from "lucide-react"
 import { useRouter } from "next/navigation"
@@ -15,6 +16,7 @@ const PASSWORD_MIN_LENGTH = 6
 const PASSWORD_MAX_LENGTH = 12
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const PASSWORD_POLICY_REGEX = /^(?=.*[A-Za-z])(?=.*\d).+$/
+const ALLOW_SIGN_UP = process.env.NEXT_PUBLIC_AUTH_ALLOW_SIGN_UP !== "false"
 
 export default function SignUp() {
   const [name, setName] = useState("")
@@ -25,6 +27,24 @@ export default function SignUp() {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+
+  if (!ALLOW_SIGN_UP) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Card className="max-w-md flex-1">
+          <CardHeader>
+            <CardTitle className="text-lg md:text-xl">注册已关闭</CardTitle>
+            <CardDescription className="text-xs md:text-sm">当前站点不开放公开注册，如需账号请联系管理员。</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link href="/sign-in" className="text-sm underline">
+              返回登录
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
