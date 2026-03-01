@@ -86,17 +86,6 @@ export const auth = betterAuth({
   user: {
     changeEmail: {
       enabled: true,
-      async sendChangeEmailVerification({ user, newEmail, url }) {
-        await sendAuthEmail({
-          to: newEmail,
-          subject: `【${APP_NAME}】确认修改邮箱`,
-          title: "确认修改邮箱",
-          intro: `你正在 ${APP_NAME} 请求将邮箱从 ${user.email} 修改为 ${newEmail}，请点击下方按钮确认。`,
-          actionText: "确认修改邮箱",
-          actionUrl: url,
-          fallbackText: "如果按钮无法点击，请复制下方链接到浏览器打开：",
-        })
-      },
     },
   },
 
