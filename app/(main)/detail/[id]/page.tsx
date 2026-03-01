@@ -11,9 +11,13 @@ export const metadata: Metadata = {
 
 export default function DramaDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{
     id: string
+  }>
+  searchParams: Promise<{
+    source?: string
   }>
 }) {
   return (
@@ -24,16 +28,24 @@ export default function DramaDetailPage({
 
       <main className="max-w-350 mx-auto px-4 md:px-10 py-6">
         <Suspense fallback={<div className="aspect-video bg-muted animate-pulse rounded-lg" />}>
-          <DramaContent params={params} />
+          <DramaContent params={params} searchParams={searchParams} />
         </Suspense>
       </main>
     </div>
   )
 }
 
-async function DramaContent({ params }: { params: Promise<{ id: string }> }) {
+async function DramaContent({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ source?: string }>
+}) {
   const { id } = await params
+  const { source } = await searchParams
   const defaultSource = await dramaApiService.getDefaultSource()
-  const drama = await dramaApiService.getDetail({ id: Number(id), source: defaultSource.name })
-  return <VideoPlayerSection drama={drama} />
+  const sourceName = source?.trim() || defaultSource.name
+  const drama = await dramaApiService.getDetail({ id: Number(id), source: sourceName })
+  return <VideoPlayerSection drama={drama} sourceName={sourceName} />
 }

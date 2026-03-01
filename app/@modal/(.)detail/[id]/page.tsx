@@ -7,20 +7,34 @@ import { formatDate } from "@/lib/formatDate"
 import PlayButton from "../../_components/play-button"
 import { Suspense } from "react"
 
-export default function DetailModal({ params }: { params: Promise<{ id: string }> }) {
+export default function DetailModal({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ source?: string }>
+}) {
   return (
     <Modal title="">
       <Suspense fallback={<div className="h-[85vh] bg-background animate-pulse" />}>
-        <DetailContent params={params} />
+        <DetailContent params={params} searchParams={searchParams} />
       </Suspense>
     </Modal>
   )
 }
 
-async function DetailContent({ params }: { params: Promise<{ id: string }> }) {
+async function DetailContent({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ source?: string }>
+}) {
   const { id } = await params
+  const { source } = await searchParams
   const defaultSource = await dramaApiService.getDefaultSource()
-  const drama = await dramaApiService.getDetail({ id: Number(id), source: defaultSource.name })
+  const sourceName = source?.trim() || defaultSource.name
+  const drama = await dramaApiService.getDetail({ id: Number(id), source: sourceName })
 
   return (
     <div className="flex flex-col w-full bg-background overflow-hidden h-[85vh]">
@@ -64,7 +78,7 @@ async function DetailContent({ params }: { params: Promise<{ id: string }> }) {
             <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-sm">共{drama.total || drama.episodes?.length || 0}集</span>
           </div>
 
-          <PlayButton dramaId={drama.id} />
+          <PlayButton dramaId={drama.id} sourceName={sourceName} />
         </div>
       </div>
     </div>
