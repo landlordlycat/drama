@@ -1,7 +1,6 @@
 "use client"
 
 import { Play } from "lucide-react"
-import { useRouter } from "next/navigation"
 
 interface PlayButtonProps {
   dramaId: number
@@ -10,8 +9,6 @@ interface PlayButtonProps {
 }
 
 export default function PlayButton({ dramaId, sourceName, episodeIndex }: PlayButtonProps) {
-  const router = useRouter()
-
   const handlePlay = () => {
     const params = new URLSearchParams()
     const source = sourceName?.trim() || ""
@@ -22,8 +19,7 @@ export default function PlayButton({ dramaId, sourceName, episodeIndex }: PlayBu
     }
 
     const href = params.size > 0 ? `/detail/${dramaId}?${params.toString()}` : `/detail/${dramaId}`
-    window.open(href, "_blank")
-    router.back()
+    window.location.assign(href)
   }
 
   return (
