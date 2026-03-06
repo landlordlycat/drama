@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { ThemeProvider } from "@/components/theme-provier"
 import { Toaster } from "sonner"
-import ModalSlot from "./modal-slot"
 
 import "@/styles/globals.css"
 
@@ -49,7 +48,7 @@ export default function RootLayout({
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Toaster position="top-center" richColors />
-          <ModalSlot modal={modal} />
+          {modal}
           <TooltipProvider>{children}</TooltipProvider>
           {/* {children} */}
         </ThemeProvider>
