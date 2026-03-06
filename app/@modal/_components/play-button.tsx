@@ -19,6 +19,7 @@ export default function PlayButton({ dramaId, sourceName, episodeIndex }: PlayBu
     }
 
     const href = params.size > 0 ? `/detail/${dramaId}?${params.toString()}` : `/detail/${dramaId}`
+    window.dispatchEvent(new Event("dismiss-intercepted-modal"))
     window.location.assign(href)
   }
 
