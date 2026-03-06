@@ -6,14 +6,22 @@ import { useRouter } from "next/navigation"
 interface PlayButtonProps {
   dramaId: number
   sourceName?: string
+  episodeIndex?: number
 }
 
-export default function PlayButton({ dramaId, sourceName }: PlayButtonProps) {
+export default function PlayButton({ dramaId, sourceName, episodeIndex }: PlayButtonProps) {
   const router = useRouter()
 
   const handlePlay = () => {
+    const params = new URLSearchParams()
     const source = sourceName?.trim() || ""
-    const href = source ? `/detail/${dramaId}?source=${encodeURIComponent(source)}` : `/detail/${dramaId}`
+
+    if (source) params.set("source", source)
+    if (typeof episodeIndex === "number" && Number.isFinite(episodeIndex) && episodeIndex >= 0) {
+      params.set("ep", String(Math.floor(episodeIndex)))
+    }
+
+    const href = params.size > 0 ? `/detail/${dramaId}?${params.toString()}` : `/detail/${dramaId}`
     window.open(href, "_blank")
     router.back()
   }

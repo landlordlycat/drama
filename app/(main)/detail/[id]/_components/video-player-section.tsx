@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import type Artplayer from "artplayer"
 import { Calendar, FileText } from "lucide-react"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import ArtPlayer from "@/components/player/art-player"
 import { formatDate } from "@/lib/formatDate"
@@ -16,6 +17,9 @@ interface VideoPlayerSectionProps {
 }
 
 export default function VideoPlayerSection({ drama, sourceName, initialEpisodeIndex = 0 }: VideoPlayerSectionProps) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const [currentEpisodeIndex, setCurrentEpisodeIndex] = useState(() => {
     const max = Math.max(drama.episodes.length - 1, 0)
     return Math.min(Math.max(initialEpisodeIndex, 0), max)
@@ -100,6 +104,16 @@ export default function VideoPlayerSection({ drama, sourceName, initialEpisodeIn
   useEffect(() => {
     void syncHistory(true)
   }, [currentEpisodeIndex, syncHistory])
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString())
+    const nextEpisode = String(currentEpisodeIndex)
+
+    if (params.get("ep") === nextEpisode) return
+
+    params.set("ep", nextEpisode)
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+  }, [currentEpisodeIndex, pathname, router, searchParams])
 
   useEffect(() => {
     const handleBeforeUnload = () => {

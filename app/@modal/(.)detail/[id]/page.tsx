@@ -12,7 +12,7 @@ export default function DetailModal({
   searchParams,
 }: {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ source?: string }>
+  searchParams: Promise<{ source?: string; ep?: string }>
 }) {
   return (
     <Modal title="">
@@ -28,12 +28,13 @@ async function DetailContent({
   searchParams,
 }: {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ source?: string }>
+  searchParams: Promise<{ source?: string; ep?: string }>
 }) {
   const { id } = await params
-  const { source } = await searchParams
+  const { source, ep } = await searchParams
   const defaultSource = await dramaApiService.getDefaultSource()
   const sourceName = source?.trim() || defaultSource.name
+  const episodeIndex = Number.isInteger(Number(ep)) ? Math.max(Number(ep), 0) : undefined
   const drama = await dramaApiService.getDetail({ id: Number(id), source: sourceName })
 
   return (
@@ -78,7 +79,7 @@ async function DetailContent({
             <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-sm">共{drama.total || drama.episodes?.length || 0}集</span>
           </div>
 
-          <PlayButton dramaId={drama.id} sourceName={sourceName} />
+          <PlayButton dramaId={drama.id} sourceName={sourceName} episodeIndex={episodeIndex} />
         </div>
       </div>
     </div>
