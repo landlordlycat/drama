@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import type Artplayer from "artplayer"
 import { Calendar, FileText } from "lucide-react"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import ArtPlayer from "@/components/player/art-player"
 import { formatDate } from "@/lib/formatDate"
@@ -17,7 +17,6 @@ interface VideoPlayerSectionProps {
 }
 
 export default function VideoPlayerSection({ drama, sourceName, initialEpisodeIndex = 0 }: VideoPlayerSectionProps) {
-  const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [currentEpisodeIndex, setCurrentEpisodeIndex] = useState(() => {
@@ -112,8 +111,8 @@ export default function VideoPlayerSection({ drama, sourceName, initialEpisodeIn
     if (params.get("ep") === nextEpisode) return
 
     params.set("ep", nextEpisode)
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
-  }, [currentEpisodeIndex, pathname, router, searchParams])
+    window.history.replaceState(null, "", `${pathname}?${params.toString()}`)
+  }, [currentEpisodeIndex, pathname, searchParams])
 
   useEffect(() => {
     const handleBeforeUnload = () => {

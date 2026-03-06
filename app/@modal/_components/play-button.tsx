@@ -14,12 +14,11 @@ export default function PlayButton({ dramaId, sourceName, episodeIndex }: PlayBu
     const source = sourceName?.trim() || ""
 
     if (source) params.set("source", source)
-    if (typeof episodeIndex === "number" && Number.isFinite(episodeIndex) && episodeIndex >= 0) {
-      params.set("ep", String(Math.floor(episodeIndex)))
-    }
+    const normalizedEpisodeIndex =
+      typeof episodeIndex === "number" && Number.isFinite(episodeIndex) && episodeIndex >= 0 ? Math.floor(episodeIndex) : 0
+    params.set("ep", String(normalizedEpisodeIndex))
 
     const href = params.size > 0 ? `/detail/${dramaId}?${params.toString()}` : `/detail/${dramaId}`
-    window.dispatchEvent(new Event("dismiss-intercepted-modal"))
     window.location.assign(href)
   }
 

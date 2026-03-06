@@ -3,7 +3,7 @@
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { useRouter } from "next/navigation"
-import { ReactNode, useEffect, useRef, useState } from "react"
+import { ReactNode, useState } from "react"
 
 interface ModalProps {
   children: ReactNode
@@ -14,26 +14,10 @@ interface ModalProps {
 export default function Modal({ children, title, description }: ModalProps) {
   const router = useRouter()
   const [open, setOpen] = useState(true)
-  const skipBackRef = useRef(false)
-
-  useEffect(() => {
-    const handleDismiss = () => {
-      skipBackRef.current = true
-      setOpen(false)
-    }
-
-    window.addEventListener("dismiss-intercepted-modal", handleDismiss)
-    return () => window.removeEventListener("dismiss-intercepted-modal", handleDismiss)
-  }, [])
 
   const handleOpenChange = (open: boolean) => {
     setOpen(open)
     if (!open) {
-      if (skipBackRef.current) {
-        skipBackRef.current = false
-        return
-      }
-
       router.back()
     }
   }
